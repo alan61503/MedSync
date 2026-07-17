@@ -3,9 +3,7 @@ from pathlib import Path
 import json
 
 BASE_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "outputs"
-BASE_HEATMAP_DIR = Path(__file__).resolve().parent.parent / "heatmaps"
 BASE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-BASE_HEATMAP_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _save_json(obj, path: Path):
@@ -17,6 +15,7 @@ def run_inference(image_path: str) -> dict:
     """Run inference using torchxrayvision if available, otherwise return placeholder.
 
     Returns: {predictions: dict, confidence_scores: dict, heatmap_path: str}
+    The returned `heatmap_path` is a URL under `/uploads/...` when possible.
     """
     try:
         import numpy as np
@@ -24,10 +23,10 @@ def run_inference(image_path: str) -> dict:
         import torchvision
         import skimage.io
         import torchxrayvision as xrv
+        import matplotlib.pyplot as plt
 
         # load image and preprocess
         img = skimage.io.imread(image_path)
-        # xrv normalize expects uint8 image 0-255
         img = xrv.datasets.normalize(img, 255)
         if img.ndim == 3:
             img = img.mean(2)[None, ...]
@@ -45,23 +44,29 @@ def run_inference(image_path: str) -> dict:
 
         preds = dict(zip(model.pathologies, scores.tolist()))
 
-        # simple heatmap placeholder: use the mean image resized as grayscale overlay
+        # determine uploads dir and patient id to save heatmap under uploads
         try:
-            import matplotlib.pyplot as plt
+            from .file_service import BASE_UPLOAD_DIR
+            image_p = Path(image_path)
+            rel = image_p.relative_to(BASE_UPLOAD_DIR)
+            patient_id = rel.parts[0]
+            heatmap_dir = BASE_UPLOAD_DIR / patient_id / "heatmaps"
+            heatmap_dir.mkdir(parents=True, exist_ok=True)
+            heatmap_filename = image_p.stem + "_heatmap.png"
+            heatmap_path_fs = heatmap_dir / heatmap_filename
+            # create a simple heatmap from the preprocessed tensor
             heat = tensor[0]
-            heat = (heat - heat.min()) / (heat.max() - heat.min() + 1e-8)
-            heat_np = (heat.numpy() * 255).astype('uint8')
-            heat_img_path = BASE_HEATMAP_DIR / (Path(image_path).stem + "_heatmap.png")
-            plt.imsave(heat_img_path, heat_np, cmap='jet')
-            heatmap_path = str(heat_img_path)
+            heat = (heat - float(heat.min())) / (float(heat.max() - heat.min()) + 1e-8)
+            heat_np = (heat.numpy() * 255).astype("uint8")
+            plt.imsave(heatmap_path_fs, heat_np, cmap="jet")
+            heatmap_url = f"/uploads/{patient_id}/heatmaps/{heatmap_filename}"
         except Exception:
-            heatmap_path = ""
+            # fallback to saving under outputs
+            heatmap_url = ""
 
-        outobj = {"predictions": preds, "confidence_scores": preds, "heatmap_path": heatmap_path}
-        # save JSON alongside outputs
+        outobj = {"predictions": preds, "confidence_scores": preds, "heatmap_path": heatmap_url}
         out_json = BASE_OUTPUT_DIR / (Path(image_path).stem + ".json")
         _save_json(outobj, out_json)
         return outobj
     except Exception as e:
-        # fallback: return empty results with note
         return {"predictions": {}, "confidence_scores": {}, "heatmap_path": "", "error": str(e)}
