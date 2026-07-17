@@ -5,3 +5,11 @@ backend/dev.db
 frontend/.next
 /.env
 uploads/
+.venv/
+frontend/.venv/
+backend/.venv/
+.pytest_cache/
+.mypy_cache/
+dist/
+build/
+.idea/

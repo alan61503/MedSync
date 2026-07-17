@@ -1,0 +1,34 @@
+{
+  "predictions": {
+    "pneumonia": 0.5524284839630127
+  },
+  "supporting_findings": {
+    "Lung Opacity": 0.6688648462295532,
+    "Effusion": 0.6766231060028076,
+    "Consolidation": 0.5762079358100891,
+    "Infiltration": 0.5280460119247437,
+    "Atelectasis": 0.5994470119476318
+  },
+  "confidence_scores": {
+    "Atelectasis": 0.5994470119476318,
+    "Consolidation": 0.5762079358100891,
+    "Infiltration": 0.5280460119247437,
+    "Pneumothorax": 0.5485514998435974,
+    "Edema": 0.5475459694862366,
+    "Emphysema": 0.5250409841537476,
+    "Fibrosis": 0.5390194654464722,
+    "Effusion": 0.6766231060028076,
+    "Pneumonia": 0.5524284839630127,
+    "Pleural_Thickening": 0.5919115543365479,
+    "Cardiomegaly": 0.6120630502700806,
+    "Nodule": 0.5253945589065552,
+    "Mass": 0.5948847532272339,
+    "Hernia": 0.31591400504112244,
+    "Lung Lesion": 0.5497214794158936,
+    "Fracture": 0.5202134847640991,
+    "Lung Opacity": 0.6688648462295532,
+    "Enlarged Cardiomediastinum": 0.6591819524765015,
+    "osteoporosis": 0.7966674342751503
+  },
+  "heatmap_path": ""
+}

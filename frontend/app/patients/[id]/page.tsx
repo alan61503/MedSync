@@ -83,34 +83,40 @@ export default function PatientPage() {
 
       {inference && (
         <section className="mt-6 bg-white p-4 rounded shadow">
-          <h3 className="font-semibold">Inference Results</h3>
+          <h3 className="font-semibold">Pneumonia Check</h3>
           {inference.error && <div className="text-red-600">Error: {inference.error}</div>}
-          <div className="grid grid-cols-2 gap-4 mt-3">
-            <div>
-              <h4 className="font-medium">Top Predictions</h4>
+
+          <div className="mt-3">
+            <div className="text-sm">Pneumonia likelihood:</div>
+            <div className="text-2xl font-bold text-red-600">{(inference.predictions?.pneumonia ?? 0).toFixed(2)}</div>
+            <div className="h-2 bg-gray-200 rounded mt-2 w-full">
+              <div className="h-2 bg-red-500 rounded" style={{ width: `${Math.min(100, (inference.predictions?.pneumonia ?? 0) * 100)}%` }} />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h4 className="font-medium">Supporting Findings</h4>
+            {inference.supporting_findings && Object.keys(inference.supporting_findings).length > 0 ? (
               <ul>
-                {Object.entries(inference.predictions || {}).sort((a: any, b: any) => (b[1] as number) - (a[1] as number)).slice(0,5).map(([k, v]: any) => (
-                  <li key={k} className="py-1">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm">{k.replace(/_/g, ' ')}</div>
-                      <div className="text-xs text-gray-600">{(v as number).toFixed(2)}</div>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded mt-1">
-                      <div className="h-2 bg-indigo-500 rounded" style={{ width: `${Math.min(100, (v as number) * 100)}%` }} />
-                    </div>
+                {Object.entries(inference.supporting_findings).map(([k, v]: any) => (
+                  <li key={k} className="py-1 flex items-center justify-between">
+                    <div className="text-sm">{k}</div>
+                    <div className="text-xs text-gray-600">{(v as number).toFixed(2)}</div>
                   </li>
                 ))}
               </ul>
-            </div>
+            ) : (
+              <div className="text-sm text-gray-500">No supporting findings detected</div>
+            )}
+          </div>
 
-            <div>
-              <h4 className="font-medium">Heatmap</h4>
-              {inference.heatmap_path ? (
-                <img src={(inference.heatmap_path as string).startsWith('/uploads') ? `http://localhost:8000${inference.heatmap_path}` : inference.heatmap_path} alt="heatmap" className="max-h-96 object-contain" />
-              ) : (
-                <div className="text-sm text-gray-500">No heatmap available</div>
-              )}
-            </div>
+          <div className="mt-4">
+            <h4 className="font-medium">Heatmap</h4>
+            {inference.heatmap_path ? (
+              <img src={(inference.heatmap_path as string).startsWith('/uploads') ? `http://localhost:8000${inference.heatmap_path}` : inference.heatmap_path} alt="heatmap" className="max-h-96 object-contain" />
+            ) : (
+              <div className="text-sm text-gray-500">No heatmap available</div>
+            )}
           </div>
         </section>
       )}

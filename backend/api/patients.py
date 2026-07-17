@@ -8,6 +8,7 @@ from ..db import get_db, engine
 from ..services.file_service import save_file, detect_modality, is_dicom_file, BASE_UPLOAD_DIR
 from ..services.report_service import extract_text_from_pdf
 from ..services.xray_service import run_inference
+from ..services.xray_service import run_inference as generate_osteoporosis_report
 import json
 import shutil
 from pathlib import Path
@@ -96,6 +97,40 @@ def upload_image(patient_id: str, files: List[UploadFile] = File(...), db: Sessi
         saved.append({"id": img.id, "filename": img.filename, "modality": img.modality, "inference": inference})
 
     return {"saved": saved}
+
+
+
+@router.post("/patients/{patient_id}/osteoporosis-report")
+def osteoporosis_report(patient_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Endpoint that accepts a single xray upload, runs the osteoporosis-focused pipeline,
+    saves inference JSON + heatmap, and returns a short report JSON."""
+    patient = db.get(models.Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+
+    # save file
+    path = save_file(patient_id, "xrays", file.filename, file.file)
+    final_dir = BASE_UPLOAD_DIR / patient_id / "xrays"
+    final_dir.mkdir(parents=True, exist_ok=True)
+    final_path = final_dir / os.path.basename(path)
+    if str(final_path) != path:
+        os.replace(path, str(final_path))
+        path = str(final_path)
+
+    inference = run_inference(path)
+    # call LLM (will fallback to offline report if groq fails)
+    llm = __import__("services.llm_service", fromlist=["analyse"]).analyse(inference.get("predictions", {}), inference.get("confidence_scores", {}), {"heatmap": inference.get("heatmap_path")})
+
+    # persist inference JSON next to image
+    try:
+        img_path = Path(path)
+        inf_json_path = img_path.with_suffix(img_path.suffix + ".json")
+        with open(inf_json_path, "w", encoding="utf-8") as fh:
+            json.dump({"inference": inference, "llm": llm}, fh, indent=2)
+    except Exception:
+        pass
+
+    return {"inference": inference, "llm": llm}
 
 
 @router.post("/patients/{patient_id}/upload-report")
