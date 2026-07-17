@@ -162,19 +162,6 @@ def upload_report(patient_id: str, file: UploadFile = File(None), text: str = Fo
     return {"id": report.id, "text_preview": (extracted[:200] if extracted else None)}
 
 
-@router.get("/patients/{patient_id}", response_model=schemas.PatientOut)
-def get_patient(patient_id: str, db: Session = Depends(get_db)):
-    patient = db.get(models.Patient, patient_id)
-    if not patient:
-        raise HTTPException(status_code=404, detail="Patient not found")
-    return patient
-
-
-@router.get("/patients", response_model=List[schemas.PatientOut])
-def list_patients(db: Session = Depends(get_db)):
-    return db.query(models.Patient).all()
-
-
 @router.get("/patients/summary")
 def patients_summary(db: Session = Depends(get_db)):
     results = []
@@ -206,6 +193,19 @@ def patients_summary(db: Session = Depends(get_db)):
         )
 
     return results
+
+
+@router.get("/patients/{patient_id}", response_model=schemas.PatientOut)
+def get_patient(patient_id: str, db: Session = Depends(get_db)):
+    patient = db.get(models.Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    return patient
+
+
+@router.get("/patients", response_model=List[schemas.PatientOut])
+def list_patients(db: Session = Depends(get_db)):
+    return db.query(models.Patient).all()
 
 
 @router.delete("/patients/{patient_id}")

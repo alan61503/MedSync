@@ -35,6 +35,35 @@ def list_images_for_patient(patient_id: str):
     return items
 
 
+@app.route('/api/patients/summary', methods=['GET'])
+def patients_summary():
+    # Return a simple summary list the frontend expects
+    summaries = []
+    for d in sorted(BASE_UPLOAD_DIR.iterdir()):
+        if not d.is_dir():
+            continue
+        pid = d.name
+        xrays_dir = d / "xrays"
+        xrays = 0
+        if xrays_dir.exists():
+            xrays = sum(1 for f in xrays_dir.iterdir() if f.is_file())
+        # placeholder counts for CT/MRI/reports
+        ct = 0
+        mri = 0
+        reports = 0
+        completion = min(100, xrays * 10)
+        summaries.append({
+            "id": pid,
+            "name": f"Patient {pid}",
+            "xrays": xrays,
+            "ct": ct,
+            "mri": mri,
+            "reports": reports,
+            "completion": completion,
+        })
+    return jsonify(summaries)
+
+
 @app.route('/api/patients/<patient_id>', methods=['GET'])
 def get_patient(patient_id):
     # Return a minimal patient object frontend expects

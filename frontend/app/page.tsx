@@ -14,31 +14,40 @@ type Summary = {
 export default function Page() {
   const [patients, setPatients] = useState<Summary[]>([]);
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", age: "", gender: "", medical_history: "", previous_diseases: "", symptoms: "", notes: "" });
 
+  const loadPatients = async () => {
+    const response = await fetch("http://localhost:8000/api/patients/summary");
+    const data = await response.json();
+    setPatients(Array.isArray(data) ? data : []);
+  };
+
   useEffect(() => {
-    fetch("http://localhost:8000/api/patients/summary")
-      .then((r) => r.json())
-      .then(setPatients)
-      .catch(console.error);
+    loadPatients().catch(console.error);
   }, []);
 
   const createPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreating(true);
-    const payload = { ...form, age: form.age ? parseInt(form.age) : undefined };
-    const res = await fetch("http://localhost:8000/api/patients", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    setCreating(false);
-    if (res.ok) {
+    setError(null);
+    try {
+      const payload = { ...form, age: form.age ? parseInt(form.age) : undefined };
+      const res = await fetch("http://localhost:8000/api/patients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to create patient");
+      }
+
       setForm({ name: "", age: "", gender: "", medical_history: "", previous_diseases: "", symptoms: "", notes: "" });
-      // refresh list
-      fetch("http://localhost:8000/api/patients/summary").then((r) => r.json()).then(setPatients);
-    } else {
-      alert("Failed to create patient");
+      await loadPatients();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to reach the backend service");
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -58,6 +67,7 @@ export default function Page() {
           <button type="submit" disabled={creating} className="px-3 py-1 bg-green-600 text-white rounded">Create</button>
         </form>
       </div>
+      {error ? <div className="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       <div className="grid grid-cols-3 gap-4">
         {patients.map((p) => (
           <div key={p.id} className="bg-white p-4 rounded shadow">

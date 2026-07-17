@@ -30,5 +30,5 @@
     "Enlarged Cardiomediastinum": 0.6591819524765015,
     "osteoporosis": 0.7966674342751503
   },
-  "heatmap_path": ""
+  "heatmap_path": "/uploads/testpatient/heatmaps/sample_xray_heatmap.png"
 }
