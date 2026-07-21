@@ -1,0 +1,46 @@
+{
+  "disease": "Osteoporosis",
+  "osteoporosis": {
+    "score": 0.2009894371032715,
+    "percentage": 20.1,
+    "risk_level": "Low Risk (Normal)",
+    "risk_color": "green",
+    "clinical_notes": "Bone density structural parameters are within expected normal bounds."
+  },
+  "predictions": {
+    "osteoporosis": 0.2009894371032715,
+    "fracture": 0.5024735927581787,
+    "pneumonia": 0.2693864107131958
+  },
+  "supporting_findings": {
+    "Fracture Risk": 0.5024735927581787,
+    "Lung Opacity": 0.6607782244682312,
+    "Consolidation": 0.5407067537307739,
+    "Pneumonia": 0.2693864107131958,
+    "Atelectasis": 0.5022743344306946,
+    "Cardiomegaly": 0.06629031151533127
+  },
+  "confidence_scores": {
+    "Atelectasis": 0.5022743344306946,
+    "Consolidation": 0.5407067537307739,
+    "Infiltration": 0.603060781955719,
+    "Pneumothorax": 0.5034672021865845,
+    "Edema": 0.03502744436264038,
+    "Emphysema": 0.5016549825668335,
+    "Fibrosis": 0.5639381408691406,
+    "Effusion": 0.3862453103065491,
+    "Pneumonia": 0.2693864107131958,
+    "Pleural_Thickening": 0.5377514362335205,
+    "Cardiomegaly": 0.06629031151533127,
+    "Nodule": 0.5609921216964722,
+    "Mass": 0.5909610986709595,
+    "Hernia": 0.009472879581153393,
+    "Lung Lesion": 0.021577933803200722,
+    "Fracture": 0.5024735927581787,
+    "Lung Opacity": 0.6607782244682312,
+    "Enlarged Cardiomediastinum": 0.17470401525497437
+  },
+  "heatmap_path": "/uploads/testpatient/heatmaps/xray_xai_gradcam.png",
+  "overlay_path": "/uploads/testpatient/heatmaps/xray_xai_overlay.png",
+  "xai_status": "Grad-CAM Explainable AI output generated successfully"
+}
