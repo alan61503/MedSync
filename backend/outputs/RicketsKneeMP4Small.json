@@ -1,0 +1,25 @@
+{
+  "disease": "Osteoporosis",
+  "osteoporosis": {
+    "score": 0.8484355450156728,
+    "percentage": 84.8,
+    "risk_level": "High Risk (Osteoporosis)",
+    "risk_color": "red",
+    "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
+  },
+  "predictions": {
+    "osteoporosis": 0.8484355450156728,
+    "cortical_thinning": 0.9033051019068807,
+    "trabecular_degradation": 0.9654637467756402,
+    "fracture_risk": 0.5201796889305115
+  },
+  "supporting_findings": {
+    "Cortical Bone Thinning": 0.903,
+    "Trabecular Microarchitecture Degradation": 0.965,
+    "Bone Mineral Density (BMD) Attenuation": 0.848,
+    "Fragility Fracture Indicator": 0.52
+  },
+  "heatmap_path": "/uploads/alan_516f5d/heatmaps/RicketsKneeMP4Small_xai_gradcam.png",
+  "overlay_path": "/uploads/alan_516f5d/heatmaps/RicketsKneeMP4Small_xai_overlay.png",
+  "xai_status": "Grad-CAM Osteoporosis Saliency Map generated successfully"
+}
