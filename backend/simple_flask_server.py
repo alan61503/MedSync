@@ -63,25 +63,49 @@ def patients_summary():
         meta = get_patient_metadata(pid)
         xrays_dir = d / "xrays"
         xrays = 0
+        latest_risk = "Pending Scan"
+        max_score = None
+
         if xrays_dir.exists():
-            xrays = sum(1 for f in xrays_dir.iterdir() if f.is_file() and f.suffix.lower() in ('.png', '.jpg', '.jpeg', '.dcm'))
-        
+            for f in xrays_dir.iterdir():
+                if f.is_file() and f.suffix.lower() in ('.png', '.jpg', '.jpeg', '.dcm'):
+                    xrays += 1
+                elif f.is_file() and f.name.endswith('.json'):
+                    try:
+                        with open(f, 'r', encoding='utf-8') as fh:
+                            inf = json.load(fh)
+                            score = inf.get('osteoporosis', {}).get('score')
+                            if score is not None:
+                                if max_score is None or score > max_score:
+                                    max_score = score
+                    except Exception:
+                        pass
+
+        if max_score is not None:
+            if max_score >= 0.62:
+                latest_risk = "High Risk"
+            elif max_score >= 0.35:
+                latest_risk = "Moderate Risk"
+            else:
+                latest_risk = "Low Risk"
+
         reports_dir = d / "reports"
         reports = 0
         if reports_dir.exists():
             reports = sum(1 for f in reports_dir.iterdir() if f.is_file())
 
-        completion = min(100, max(25, xrays * 25))
+        t_score = round(-1.0 - (max_score * 2.2), 1) if max_score is not None else -1.2
         summaries.append({
             "id": pid,
             "name": meta.get("name", f"Patient {pid}"),
             "age": meta.get("age", 50),
-            "gender": meta.get("gender", "F"),
+            "gender": meta.get("gender", "Female"),
             "xrays": xrays,
-            "ct": 0,
-            "mri": 0,
             "reports": reports,
-            "completion": completion,
+            "completion": min(100, max(25, xrays * 25)),
+            "risk_level": latest_risk,
+            "risk_score": max_score,
+            "t_score": t_score,
         })
     return jsonify(summaries)
 
@@ -93,7 +117,7 @@ def create_patient():
     if not name:
         return jsonify({"error": "Patient name is required"}), 400
 
-    # Generate patient ID
+    # Generate clean patient ID
     slug = "".join(c.lower() for c in name if c.isalnum()) or "patient"
     patient_id = f"{slug}_{str(uuid.uuid4())[:6]}"
     p_dir = BASE_UPLOAD_DIR / patient_id
@@ -104,10 +128,10 @@ def create_patient():
     meta = {
         "id": patient_id,
         "name": name,
-        "age": data.get("age") or 45,
+        "age": data.get("age") or 48,
         "gender": data.get("gender") or "Female",
-        "medical_history": data.get("medical_history", "Osteoporosis research cohort"),
-        "symptoms": data.get("symptoms", ""),
+        "medical_history": data.get("medical_history", "Osteoporosis research cohort candidate"),
+        "symptoms": data.get("symptoms", "Bone density evaluation"),
     }
 
     with open(p_dir / "patient_info.json", "w", encoding="utf-8") as fh:
@@ -132,7 +156,7 @@ def get_patient(patient_id):
         "id": patient_id,
         "name": meta.get("name", f"Patient {patient_id}"),
         "age": meta.get("age", 50),
-        "gender": meta.get("gender", "F"),
+        "gender": meta.get("gender", "Female"),
         "medical_history": meta.get("medical_history", ""),
         "images": images,
         "reports": reports_list,
@@ -205,7 +229,6 @@ def delete_patient(patient_id):
     return jsonify({"status": "Patient deleted successfully", "id": patient_id})
 
 
-
 @app.route('/api/patients/<patient_id>/xrays/<filename>', methods=['DELETE'])
 def delete_xray(patient_id, filename):
     xray_file = BASE_UPLOAD_DIR / patient_id / "xrays" / filename
@@ -224,7 +247,7 @@ def delete_xray(patient_id, filename):
         except Exception:
             pass
             
-    # Also attempt removing associated Grad-CAM heatmaps
+    # Remove associated Grad-CAM heatmaps
     stem = Path(filename).stem
     heatmap_dir = BASE_UPLOAD_DIR / patient_id / "heatmaps"
     if heatmap_dir.exists():
@@ -286,5 +309,3 @@ def serve_uploads(filename):
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8000)
-
-

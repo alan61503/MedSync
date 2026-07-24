@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white;
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-indigo-600 selection:text-white font-['Plus_Jakarta_Sans',sans-serif];
+    background-color: #f8fafc;
   }
 }
 
@@ -12,6 +15,52 @@ html, body, #__next {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
+/* Custom Medical Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
 
+/* Range Input Custom Styling */
+input[type="range"] {
+  accent-color: #4f46e5;
+}
+
+/* Minimalist Clean Cards */
+.clean-card {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.clean-card-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.clean-card-hover:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.08);
+}
+
+/* Print Optimization */
+@media print {
+  header, footer, button, input, select, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}

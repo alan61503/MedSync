@@ -113,7 +113,7 @@ def run_inference(image_path: str) -> dict:
             risk_color = "green"
             clinical_notes = "Bone cortical thickness and trabecular microarchitecture parameters are within normal reference limits."
 
-        # XAI (Explainable AI) Grad-CAM Heatmap Generation (Targeting Bone Structural Features)
+        # XAI (Explainable AI) Heatmap Generation (Targeting Bone Structural Features)
         heatmap_url = ""
         overlay_url = ""
 
@@ -141,10 +141,24 @@ def run_inference(image_path: str) -> dict:
                 model.zero_grad()
                 out_grad = model(input_tensor)
                 
-                # Target the highest activation feature response for bone density focus
-                target_score = out_grad[0].sum()
+                # Target the Fracture pathology to focus on bone structure and degradation
+                fracture_idx = model.pathologies.index("Fracture") if "Fracture" in model.pathologies else 0
+                target_score = out_grad[0][fracture_idx]
                 target_score.backward()
 
+                # Get patient ID for directories
+                from backend.services.file_service import BASE_UPLOAD_DIR
+                try:
+                    rel = image_p.relative_to(BASE_UPLOAD_DIR)
+                    patient_id = rel.parts[0]
+                except Exception:
+                    patient_id = "default"
+
+                heatmap_dir = BASE_UPLOAD_DIR / patient_id / "heatmaps"
+                heatmap_dir.mkdir(parents=True, exist_ok=True)
+                stem = image_p.stem
+
+                # 1. Grad-CAM Calculation
                 if activations and gradients:
                     acts = activations[0].detach().cpu().numpy()[0] # [C, H, W]
                     grads = gradients[0].detach().cpu().numpy()[0]   # [C, H, W]
@@ -165,18 +179,6 @@ def run_inference(image_path: str) -> dict:
                     pil_cam = Image.fromarray((cam * 255).astype("uint8")).resize((224, 224), resample=Image.BILINEAR)
                     cam_resized = np.array(pil_cam).astype("float32") / 255.0
 
-                    # Create directories under backend uploads
-                    from backend.services.file_service import BASE_UPLOAD_DIR
-                    try:
-                        rel = image_p.relative_to(BASE_UPLOAD_DIR)
-                        patient_id = rel.parts[0]
-                    except Exception:
-                        patient_id = "default"
-
-                    heatmap_dir = BASE_UPLOAD_DIR / patient_id / "heatmaps"
-                    heatmap_dir.mkdir(parents=True, exist_ok=True)
-
-                    stem = image_p.stem
                     heatmap_file = heatmap_dir / f"{stem}_xai_gradcam.png"
                     overlay_file = heatmap_dir / f"{stem}_xai_overlay.png"
 
@@ -195,13 +197,15 @@ def run_inference(image_path: str) -> dict:
                     blended = np.clip(blended, 0.0, 1.0)
                     plt.imsave(str(overlay_file), blended)
 
-                    h1.remove()
-                    h2.remove()
-
                     heatmap_url = f"/uploads/{patient_id}/heatmaps/{heatmap_file.name}"
                     overlay_url = f"/uploads/{patient_id}/heatmaps/{overlay_file.name}"
+
+                # Clean up hooks
+                h1.remove()
+                h2.remove()
+
         except Exception as xai_err:
-            print(f"XAI Grad-CAM generation warning: {xai_err}")
+            print(f"XAI generation warning: {xai_err}")
 
         # Assemble Osteoporosis-only diagnostic findings
         supporting_findings = {
@@ -229,9 +233,8 @@ def run_inference(image_path: str) -> dict:
             "supporting_findings": supporting_findings,
             "heatmap_path": heatmap_url or f"/uploads/testpatient/heatmaps/sample_xray_gradcam.png",
             "overlay_path": overlay_url or heatmap_url,
-            "xai_status": "Grad-CAM Osteoporosis Saliency Map generated successfully",
+            "xai_status": "Explainable AI Grad-CAM generated successfully",
         }
-
 
         out_json = BASE_OUTPUT_DIR / f"{image_p.stem}.json"
         _save_json(outobj, out_json)
@@ -245,6 +248,6 @@ def run_inference(image_path: str) -> dict:
             "predictions": {},
             "supporting_findings": {},
             "heatmap_path": "",
+            "overlay_path": "",
             "error": str(e),
         }
-

@@ -21,5 +21,5 @@
   },
   "heatmap_path": "/uploads/testpatient/heatmaps/sample_xray_xai_gradcam.png",
   "overlay_path": "/uploads/testpatient/heatmaps/sample_xray_xai_overlay.png",
-  "xai_status": "Grad-CAM Osteoporosis Saliency Map generated successfully"
+  "xai_status": "Explainable AI Grad-CAM generated successfully"
 }

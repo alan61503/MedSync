@@ -1,10 +1,13 @@
 "use client";
+
 import React, { useCallback, useState } from "react";
 
 type Props = {
   patientId: string;
   onUploadComplete?: () => void;
 };
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function UploadDropzone({ patientId, onUploadComplete }: Props) {
   const [files, setFiles] = useState<File[]>([]);
@@ -33,7 +36,7 @@ export default function UploadDropzone({ patientId, onUploadComplete }: Props) {
     try {
       const fd = new FormData();
       files.forEach((f) => fd.append("files", f));
-      const res = await fetch(`http://localhost:8000/api/patients/${patientId}/upload-image`, {
+      const res = await fetch(`${API_BASE}/api/patients/${patientId}/upload-image`, {
         method: "POST",
         body: fd,
       });
@@ -65,17 +68,23 @@ export default function UploadDropzone({ patientId, onUploadComplete }: Props) {
         </div>
         <p className="font-semibold text-slate-800 text-xs">Drop X-ray image here</p>
         <p className="text-[11px] text-slate-500 mt-0.5">Supports PNG, JPG, DICOM (.dcm)</p>
-        
+
         <label className="inline-block mt-3 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg cursor-pointer transition shadow-sm">
           Browse Files
-          <input type="file" multiple accept="image/*,.dcm" onChange={(e) => onFiles(e.target.files)} className="hidden" />
+          <input
+            type="file"
+            multiple
+            accept="image/*,.dcm"
+            onChange={(e) => onFiles(e.target.files)}
+            className="hidden"
+          />
         </label>
       </div>
 
       {files.length > 0 && (
         <div className="mt-4 space-y-2">
           <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Files Ready ({files.length})</h4>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
             {files.map((f, i) => (
               <div key={i} className="flex items-center justify-between bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                 <div className="flex items-center gap-2 overflow-hidden">
@@ -90,7 +99,7 @@ export default function UploadDropzone({ patientId, onUploadComplete }: Props) {
               </div>
             ))}
           </div>
-          
+
           <button
             onClick={onUpload}
             disabled={uploading}
@@ -119,5 +128,3 @@ export default function UploadDropzone({ patientId, onUploadComplete }: Props) {
     </div>
   );
 }
-
-
