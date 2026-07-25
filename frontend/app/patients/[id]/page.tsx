@@ -32,9 +32,35 @@ export default function PatientPage() {
   const [savingNote, setSavingNote] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
+  // 2-Factor AI Verification
+  const [aiVerify, setAiVerify] = useState<any>(null);
+  const [loadingVerify, setLoadingVerify] = useState(false);
+
   const showStatus = (msg: string) => {
     setStatusMsg(msg);
     setTimeout(() => setStatusMsg(null), 4000);
+  };
+
+  const runAiVerify = async () => {
+    if (!inference) return;
+    setLoadingVerify(true);
+    setAiVerify(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/ai-verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inference }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setAiVerify(data);
+      showStatus(data.verified ? "✅ AI Verification: CONFIRMED" : "⚠️ AI Verification: FLAGGED");
+    } catch (err) {
+      showStatus("AI Verification failed. Check backend.");
+      console.error("AI Verify error:", err);
+    } finally {
+      setLoadingVerify(false);
+    }
   };
 
   const loadPatient = async () => {
@@ -470,33 +496,138 @@ VALIDATION PROMPT:
                   </div>
                 </div>
 
-                {/* GPT Validation Export (2-Factor Check) */}
+                {/* Built-in AI 2-Factor Verification (Groq LLaMA 3.3 70B) */}
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm space-y-3">
+                  {/* Header */}
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      GPT Validation Export (2-Factor Check)
-                    </h3>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-violet-600">Groq · LLaMA 3.3 70B</span>
+                      <h3 className="text-sm font-bold text-slate-900">AI 2-Factor Verification</h3>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => {
-                        const text = getGptExportText();
-                        navigator.clipboard.writeText(text);
-                        showStatus("Clinical export copied to clipboard!");
-                      }}
-                      className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded-lg transition animate-pulse"
+                      id="btn-ai-verify"
+                      onClick={runAiVerify}
+                      disabled={loadingVerify || !inference}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                        loadingVerify
+                          ? "bg-violet-100 text-violet-400 cursor-not-allowed"
+                          : "bg-violet-600 hover:bg-violet-700 text-white shadow-sm"
+                      }`}
                     >
-                      📋 Copy Text
+                      {loadingVerify ? (
+                        <>
+                          <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                          </svg>
+                          Verifying...
+                        </>
+                      ) : ("🤖 Run AI Verify")}
                     </button>
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-normal">
-                    Copy this structured summary to paste into ChatGPT/Claude to run a secondary clinical verification.
-                  </p>
-                  <textarea
-                    readOnly
-                    rows={6}
-                    value={getGptExportText()}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-[10px] font-mono text-slate-700 focus:outline-none resize-none"
-                  />
+
+                  {/* Pre-run state */}
+                  {!aiVerify && !loadingVerify && (
+                    <div className="flex flex-col items-center justify-center py-5 gap-2 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                      <span className="text-2xl">🔬</span>
+                      <p className="text-[11px] text-slate-500 text-center max-w-[220px] leading-relaxed">
+                        Click <strong>Run AI Verify</strong> to send the diagnosis to Groq LLaMA 3.3 70B for secondary clinical validation.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Loading shimmer */}
+                  {loadingVerify && (
+                    <div className="space-y-2 animate-pulse">
+                      <div className="h-8 bg-violet-100 rounded-xl w-full"/>
+                      <div className="h-4 bg-slate-100 rounded w-3/4"/>
+                      <div className="h-4 bg-slate-100 rounded w-1/2"/>
+                    </div>
+                  )}
+
+                  {/* Result panel */}
+                  {aiVerify && !loadingVerify && (() => {
+                    const verified = aiVerify.verified;
+                    const verdict = aiVerify.verdict || (verified ? "CONFIRMED" : "FLAGGED");
+                    const confidence = typeof aiVerify.confidence === "number" ? aiVerify.confidence : 0;
+                    const confPct = Math.round(confidence * 100);
+                    const verdictColors = {
+                      CONFIRMED: "bg-emerald-50 text-emerald-700 border-emerald-300",
+                      FLAGGED: "bg-rose-50 text-rose-700 border-rose-300",
+                      UNCERTAIN: "bg-amber-50 text-amber-700 border-amber-300",
+                    } as Record<string, string>;
+                    const barColor = verdict === "CONFIRMED" ? "bg-emerald-500" : verdict === "FLAGGED" ? "bg-rose-500" : "bg-amber-500";
+                    return (
+                      <div className="space-y-3">
+                        {/* Verdict Badge + Confidence */}
+                        <div className="flex items-center justify-between">
+                          <span className={`px-3 py-1 rounded-full text-xs font-black border tracking-wide ${verdictColors[verdict] || verdictColors.UNCERTAIN}`}>
+                            {verdict === "CONFIRMED" ? "✅" : verdict === "FLAGGED" ? "❌" : "⚠️"} {verdict}
+                          </span>
+                          <span className="text-[11px] font-mono font-bold text-slate-600">
+                            Confidence: {confPct}%
+                          </span>
+                        </div>
+
+                        {/* Confidence Bar */}
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                            style={{ width: `${confPct}%` }}
+                          />
+                        </div>
+
+                        {/* Clinical Alignment */}
+                        {aiVerify.clinical_alignment && (
+                          <p className="text-[11px] text-slate-600 bg-slate-50 rounded-lg p-2.5 border border-slate-200 leading-relaxed">
+                            <span className="font-bold text-slate-800">Clinical Alignment: </span>
+                            {aiVerify.clinical_alignment}
+                          </p>
+                        )}
+
+                        {/* 4-Item Checklist */}
+                        {Array.isArray(aiVerify.checklist) && aiVerify.checklist.length > 0 && (
+                          <div className="space-y-1.5">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Validation Checklist</div>
+                            {aiVerify.checklist.map((c: any, i: number) => (
+                              <div key={i} className={`flex items-start gap-2 p-2 rounded-lg text-[11px] border ${
+                                c.pass
+                                  ? "bg-emerald-50/60 border-emerald-100 text-emerald-800"
+                                  : "bg-rose-50/60 border-rose-100 text-rose-800"
+                              }`}>
+                                <span className="mt-px flex-shrink-0">{c.pass ? "✅" : "❌"}</span>
+                                <div>
+                                  <span className="font-bold">{c.item}</span>
+                                  {c.note && <span className="text-slate-500 ml-1">— {c.note}</span>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Recommendation */}
+                        {aiVerify.recommendation && (
+                          <div className="bg-violet-50 border border-violet-200 rounded-xl p-3 text-[11px] text-violet-800 leading-relaxed">
+                            <span className="font-bold">💡 Recommendation: </span>
+                            {aiVerify.recommendation}
+                          </div>
+                        )}
+
+                        {/* Meta footer */}
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px] text-slate-400 font-mono">
+                          <span>Model: {aiVerify._meta?.model || "llama-3.3-70b"}</span>
+                          <span>Latency: {aiVerify._meta?.latency_s ?? "–"}s</span>
+                          <button
+                            onClick={() => { setAiVerify(null); }}
+                            className="text-slate-400 hover:text-slate-600 font-bold text-[10px] transition"
+                          >
+                            ↺ Reset
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
               </div>

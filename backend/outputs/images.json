@@ -21,9 +21,5 @@
   },
   "heatmap_path": "/uploads/alan_516f5d/heatmaps/images_xai_gradcam.png",
   "overlay_path": "/uploads/alan_516f5d/heatmaps/images_xai_overlay.png",
-  "saliency_path": "/uploads/alan_516f5d/heatmaps/images_xai_saliency.png",
-  "saliency_overlay_path": "/uploads/alan_516f5d/heatmaps/images_xai_saliency_overlay.png",
-  "sobel_path": "/uploads/alan_516f5d/heatmaps/images_xai_sobel.png",
-  "sobel_overlay_path": "/uploads/alan_516f5d/heatmaps/images_xai_sobel_overlay.png",
-  "xai_status": "Explainable AI maps generated successfully"
+  "xai_status": "Explainable AI Grad-CAM generated successfully"
 }

@@ -301,6 +301,20 @@ def run_inference_endpoint():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/api/ai-verify', methods=['POST'])
+def ai_verify_endpoint():
+    payload = request.get_json() or {}
+    inference = payload.get('inference')
+    if not inference:
+        return jsonify({"error": "inference data required"}), 400
+    try:
+        from backend.services.llm_service import verify_inference
+        result = verify_inference(inference)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     root = str(BASE_UPLOAD_DIR)

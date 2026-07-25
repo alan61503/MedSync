@@ -53,3 +53,16 @@ def run_inference_endpoint(payload: dict):
 
     res = run_inference(file_path)
     return res
+
+
+@app.post("/api/ai-verify")
+def ai_verify_endpoint(payload: dict):
+    """2-Factor AI Verification: send inference results to Groq LLaMA 3.3 70B for clinical validation."""
+    inference = payload.get("inference")
+    if not inference:
+        raise HTTPException(status_code=400, detail="inference data required")
+
+    from .services.llm_service import verify_inference
+
+    result = verify_inference(inference)
+    return result
