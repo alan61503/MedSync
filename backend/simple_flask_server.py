@@ -43,7 +43,7 @@ def list_images_for_patient(patient_id: str):
         return []
     items = []
     for f in sorted(p.iterdir()):
-        if f.is_file() and f.suffix.lower() in (".png", ".jpg", ".jpeg", ".dcm"):
+        if f.is_file() and f.suffix.lower() in (".png", ".jpg", ".jpeg", ".dcm", ".webp", ".bmp", ".tiff"):
             items.append({
                 "id": str(uuid.uuid4()),
                 "filename": f.name,
@@ -68,7 +68,7 @@ def patients_summary():
 
         if xrays_dir.exists():
             for f in xrays_dir.iterdir():
-                if f.is_file() and f.suffix.lower() in ('.png', '.jpg', '.jpeg', '.dcm'):
+                if f.is_file() and f.suffix.lower() in ('.png', '.jpg', '.jpeg', '.dcm', '.webp', '.bmp', '.tiff'):
                     xrays += 1
                 elif f.is_file() and f.name.endswith('.json'):
                     try:

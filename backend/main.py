@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from .db import engine, Base
 from .api import patients
 from pathlib import Path
+from .services.file_service import BASE_UPLOAD_DIR
 
 from fastapi import HTTPException
 
@@ -27,7 +28,7 @@ def on_startup():
 app.include_router(patients.router, prefix="/api")
 
 # serve uploaded files
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app.mount("/uploads", StaticFiles(directory=str(BASE_UPLOAD_DIR)), name="uploads")
 
 
 @app.post("/api/run-inference")
@@ -41,11 +42,11 @@ def run_inference_endpoint(payload: dict):
         parts = image_url.split("/uploads/")
         if len(parts) > 1:
             rel = parts[1]
-            file_path = str(Path("uploads") / rel)
+            file_path = str(BASE_UPLOAD_DIR / rel)
         else:
             file_path = image_url
     elif isinstance(image_url, str) and image_url.startswith("/uploads"):
-        file_path = str(Path(image_url.lstrip("/")))
+        file_path = str(BASE_UPLOAD_DIR / image_url.removeprefix("/uploads/").lstrip("/"))
     else:
         file_path = image_url
 

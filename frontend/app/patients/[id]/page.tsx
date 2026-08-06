@@ -1,11 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import UploadDropzone from "../../../components/UploadDropzone";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+const getImageUrl = (path?: string | null) => {
+  if (!path) return "";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE}${cleanPath}`;
+};
 
 type ViewMode = "overlay" | "side-by-side" | "heatmap" | "original";
 
@@ -63,7 +70,12 @@ export default function PatientPage() {
     }
   };
 
-  const loadPatient = async () => {
+  const isSamePath = (p1?: string | null, p2?: string | null) => {
+    if (!p1 || !p2) return false;
+    return getImageUrl(p1) === getImageUrl(p2);
+  };
+
+  const loadPatient = async (options?: { selectLatest?: boolean; preserveInferenceFor?: string; skipInferenceFetch?: boolean }) => {
     if (!id) return;
     try {
       const res = await fetch(`${API_BASE}/api/patients/${id}`);
@@ -71,10 +83,22 @@ export default function PatientPage() {
       const data = await res.json();
       setPatient(data);
 
-      if (data.images && data.images.length > 0 && !selectedImage) {
-        const firstImg = data.images[0].file_path;
-        setSelectedImage(firstImg);
-        fetchInference(firstImg);
+      if (data.images && data.images.length > 0) {
+        const imagePaths = data.images.map((img: any) => img.file_path);
+        const latestImg = data.images[data.images.length - 1].file_path;
+        const currentSelection = selectedImage;
+        const shouldSelectLatest = options?.selectLatest || !currentSelection || !imagePaths.some((p: string) => isSamePath(p, currentSelection));
+
+        if (shouldSelectLatest) {
+          setSelectedImage(latestImg);
+          const isPreserved = options?.skipInferenceFetch || isSamePath(options?.preserveInferenceFor, latestImg);
+          if (!isPreserved) {
+            fetchInference(latestImg);
+          }
+        }
+      } else if (!options?.skipInferenceFetch && !options?.preserveInferenceFor) {
+        setSelectedImage(null);
+        setInference(null);
       }
     } catch (err) {
       console.error("Failed to load patient:", err);
@@ -85,18 +109,35 @@ export default function PatientPage() {
     loadPatient();
   }, [id]);
 
+  const handleUploadComplete = async (payload?: any) => {
+    const savedImage = payload?.saved?.[0];
+    if (savedImage?.file_path) {
+      setSelectedImage(savedImage.file_path);
+      if (savedImage.inference) {
+        setInference(savedImage.inference);
+      }
+    }
+
+    await loadPatient({
+      selectLatest: true,
+      preserveInferenceFor: savedImage?.file_path,
+      skipInferenceFetch: !!savedImage?.inference,
+    });
+  };
+
   const fetchInference = async (imagePath: string) => {
     setLoadingInference(true);
-    setInference(null);
     try {
-      const fullUrl = imagePath.startsWith("http") ? imagePath : `${API_BASE}${imagePath}`;
+      const fullUrl = getImageUrl(imagePath);
       const res = await fetch(`${API_BASE}/api/run-inference`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image_url: fullUrl }),
       });
       const data = await res.json();
-      setInference(data);
+      if (data && !data.error) {
+        setInference(data);
+      }
     } catch (err) {
       console.error("Inference error:", err);
     } finally {
@@ -223,8 +264,11 @@ Recommendation: Physician review and follow-up DEXA scan scheduled.`;
     filter: `brightness(${brightness}%) contrast(${contrast}%)`,
   };
 
-  const activeHeatmap = inference?.heatmap_path ? `${API_BASE}${inference.heatmap_path}` : undefined;
-  const activeOverlay = inference?.overlay_path ? `${API_BASE}${inference.overlay_path}` : undefined;
+  const rawHeatmap = inference?.heatmap_path || inference?.heatmap_url || inference?.overlay_path;
+  const rawOverlay = inference?.overlay_path || inference?.overlay_url || inference?.heatmap_path || inference?.heatmap_url;
+
+  const activeHeatmap = rawHeatmap ? getImageUrl(rawHeatmap) : undefined;
+  const activeOverlay = rawOverlay ? getImageUrl(rawOverlay) : undefined;
 
   const getGptExportText = () => {
     if (!patient || !inference) return "";
@@ -329,7 +373,7 @@ VALIDATION PROMPT:
             
             <div className="lg:col-span-1">
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Upload Test Scan</h2>
-              <UploadDropzone patientId={patient.id} onUploadComplete={loadPatient} />
+              <UploadDropzone patientId={patient.id} onUploadComplete={handleUploadComplete} />
             </div>
 
             <div className="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
@@ -349,9 +393,7 @@ VALIDATION PROMPT:
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-44 overflow-y-auto pr-1">
                     {patient.images.map((img: any) => {
                       const isSelected = selectedImage === img.file_path;
-                      const imgUrl = img.file_path.startsWith("http")
-                        ? img.file_path
-                        : `${API_BASE}${img.file_path}`;
+                      const imgUrl = getImageUrl(img.file_path);
                       return (
                         <div
                           key={img.id}
@@ -769,7 +811,7 @@ VALIDATION PROMPT:
                     {xaiMode === "overlay" && selectedImage && (
                       <div className="relative max-h-[360px] inline-flex items-center justify-center">
                         <img
-                          src={`${API_BASE}${selectedImage}`}
+                          src={getImageUrl(selectedImage)}
                           alt="Base Scan"
                           style={baseImageFilterStyle}
                           className="max-h-[360px] w-auto object-contain rounded"
@@ -793,7 +835,7 @@ VALIDATION PROMPT:
                           <span className="text-[10px] font-bold text-slate-300 mb-1">Original Scan</span>
                           {selectedImage && (
                             <img
-                              src={`${API_BASE}${selectedImage}`}
+                              src={getImageUrl(selectedImage)}
                               alt="Original"
                               style={baseImageFilterStyle}
                               className="max-h-[320px] object-contain rounded border border-slate-700"
@@ -825,7 +867,7 @@ VALIDATION PROMPT:
                     {/* Original Mode */}
                     {xaiMode === "original" && selectedImage && (
                       <img
-                        src={`${API_BASE}${selectedImage}`}
+                        src={getImageUrl(selectedImage)}
                         alt="Original Scan"
                         style={baseImageFilterStyle}
                         className="max-h-[360px] w-auto object-contain rounded"
@@ -922,7 +964,7 @@ VALIDATION PROMPT:
             {selectedImage && (
               <div className="relative max-h-[80vh] inline-flex items-center justify-center">
                 <img
-                  src={`${API_BASE}${selectedImage}`}
+                  src={getImageUrl(selectedImage)}
                   alt="Fullscreen Scan"
                   style={baseImageFilterStyle}
                   className="max-h-[80vh] w-auto object-contain rounded border border-slate-800"

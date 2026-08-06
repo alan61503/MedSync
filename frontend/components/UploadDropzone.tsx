@@ -4,7 +4,7 @@ import React, { useCallback, useState } from "react";
 
 type Props = {
   patientId: string;
-  onUploadComplete?: () => void;
+  onUploadComplete?: (payload: any) => void;
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -41,9 +41,10 @@ export default function UploadDropzone({ patientId, onUploadComplete }: Props) {
         body: fd,
       });
       if (res.ok) {
+        const data = await res.json();
         setStatusMsg("Upload successful & XAI generated!");
         setFiles([]);
-        if (onUploadComplete) onUploadComplete();
+        if (onUploadComplete) await onUploadComplete(data);
       } else {
         setStatusMsg("Upload failed. Please try again.");
       }

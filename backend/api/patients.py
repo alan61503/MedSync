@@ -16,6 +16,14 @@ from pathlib import Path
 router = APIRouter()
 
 
+def _public_upload_url(file_path: str) -> str:
+    try:
+        relative_path = Path(file_path).resolve().relative_to(BASE_UPLOAD_DIR.resolve())
+        return f"/uploads/{relative_path.as_posix()}"
+    except Exception:
+        return file_path
+
+
 @router.post("/patients", response_model=schemas.PatientOut)
 def create_patient(payload: schemas.PatientCreate, db: Session = Depends(get_db)):
     patient = models.Patient(
@@ -66,22 +74,18 @@ def upload_image(patient_id: str, files: List[UploadFile] = File(...), db: Sessi
         # run inference (best-effort)
         inference = run_inference(path)
 
-        # persist inference next to the image and move heatmap into uploads patient folder
+        # persist inference next to the image
         try:
             img_path = Path(path)
             inf_obj = inference or {}
-            # move heatmap into uploads/{patient_id}/heatmaps
-            heatmap_src = inf_obj.get("heatmap_path")
-            if heatmap_src:
-                heatmap_src_path = Path(heatmap_src)
-                dest_dir = BASE_UPLOAD_DIR / patient_id / "heatmaps"
-                dest_dir.mkdir(parents=True, exist_ok=True)
-                dest_path = dest_dir / heatmap_src_path.name
-                try:
-                    shutil.move(str(heatmap_src_path), str(dest_path))
-                    inf_obj["heatmap_url"] = f"/uploads/{patient_id}/heatmaps/{dest_path.name}"
-                except Exception:
-                    inf_obj["heatmap_url"] = None
+            hp = inf_obj.get("heatmap_path") or inf_obj.get("heatmap_url")
+            op = inf_obj.get("overlay_path") or inf_obj.get("overlay_url") or hp
+            if hp:
+                inf_obj["heatmap_path"] = hp
+                inf_obj["heatmap_url"] = hp
+            if op:
+                inf_obj["overlay_path"] = op
+                inf_obj["overlay_url"] = op
 
             # write inference JSON next to the stored image
             inf_json_path = img_path.with_suffix(img_path.suffix + ".json")
@@ -94,7 +98,13 @@ def upload_image(patient_id: str, files: List[UploadFile] = File(...), db: Sessi
         db.add(img)
         db.commit()
         db.refresh(img)
-        saved.append({"id": img.id, "filename": img.filename, "modality": img.modality, "inference": inference})
+        saved.append({
+            "id": img.id,
+            "filename": img.filename,
+            "modality": img.modality,
+            "file_path": _public_upload_url(img.file_path),
+            "inference": inference,
+        })
 
     return {"saved": saved}
 
@@ -200,7 +210,34 @@ def get_patient(patient_id: str, db: Session = Depends(get_db)):
     patient = db.get(models.Patient, patient_id)
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
-    return patient
+    return {
+        "id": patient.id,
+        "name": patient.name,
+        "age": patient.age,
+        "gender": patient.gender,
+        "medical_history": patient.medical_history,
+        "previous_diseases": patient.previous_diseases,
+        "symptoms": patient.symptoms,
+        "notes": patient.notes,
+        "created_at": patient.created_at,
+        "images": [
+            {
+                "id": img.id,
+                "filename": img.filename,
+                "file_path": _public_upload_url(img.file_path),
+                "modality": img.modality,
+            }
+            for img in patient.images
+        ],
+        "reports": [
+            {
+                "id": report.id,
+                "filename": report.filename,
+                "text": report.text,
+            }
+            for report in patient.reports
+        ],
+    }
 
 
 @router.get("/patients", response_model=List[schemas.PatientOut])
@@ -249,7 +286,7 @@ def patient_structured(patient_id: str, db: Session = Depends(get_db)):
             key = "ct"
         elif img.modality and img.modality.upper() == "MR":
             key = "mri"
-        data["images"][key].append({"id": img.id, "filename": img.filename, "path": img.file_path})
+        data["images"][key].append({"id": img.id, "filename": img.filename, "path": _public_upload_url(img.file_path)})
 
     for r in patient.reports:
         data["reports"].append({"id": r.id, "filename": r.filename, "text": (r.text[:500] + "...") if r.text and len(r.text) > 500 else r.text})

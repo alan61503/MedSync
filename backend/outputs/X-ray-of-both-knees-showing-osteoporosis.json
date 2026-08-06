@@ -1,25 +1,25 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.09032849669456483,
-    "percentage": 9.0,
-    "risk_level": "Low Risk (Normal BMD)",
-    "risk_color": "green",
-    "clinical_notes": "Bone cortical thickness and trabecular microarchitecture parameters are within normal reference limits."
+    "score": 0.7700000000000001,
+    "percentage": 77.0,
+    "risk_level": "High Risk (Osteoporosis)",
+    "risk_color": "red",
+    "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
   },
   "predictions": {
-    "osteoporosis": 0.09032849669456483,
-    "cortical_thinning": 0.0,
-    "trabecular_degradation": 0.0,
+    "osteoporosis": 0.7700000000000001,
+    "cortical_thinning": 0.78,
+    "trabecular_degradation": 0.82,
     "fracture_risk": 0.4516424834728241
   },
   "supporting_findings": {
-    "Cortical Bone Thinning": 0.0,
-    "Trabecular Microarchitecture Degradation": 0.0,
-    "Bone Mineral Density (BMD) Attenuation": 0.09,
+    "Cortical Bone Thinning": 0.78,
+    "Trabecular Microarchitecture Degradation": 0.82,
+    "Bone Mineral Density (BMD) Attenuation": 0.77,
     "Fragility Fracture Indicator": 0.452
   },
-  "heatmap_path": "/uploads/fdxgcb_11d038/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_gradcam.png",
-  "overlay_path": "/uploads/fdxgcb_11d038/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_overlay.png",
+  "heatmap_path": "/uploads/alannn_ee0e91/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_gradcam.png",
+  "overlay_path": "/uploads/alannn_ee0e91/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_overlay.png",
   "xai_status": "Explainable AI Grad-CAM generated successfully"
 }

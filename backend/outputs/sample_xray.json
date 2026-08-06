@@ -19,7 +19,7 @@
     "Bone Mineral Density (BMD) Attenuation": 0.868,
     "Fragility Fracture Indicator": 0.52
   },
-  "heatmap_path": "/uploads/testpatient/heatmaps/sample_xray_xai_gradcam.png",
-  "overlay_path": "/uploads/testpatient/heatmaps/sample_xray_xai_overlay.png",
+  "heatmap_path": "/uploads/testpatient_682e5a/heatmaps/sample_xray_xai_gradcam.png",
+  "overlay_path": "/uploads/testpatient_682e5a/heatmaps/sample_xray_xai_overlay.png",
   "xai_status": "Explainable AI Grad-CAM generated successfully"
 }

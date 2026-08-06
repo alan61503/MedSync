@@ -1,10 +1,13 @@
 "use client";
 import { useEffect } from "react";
-import { initFirebase } from "../lib/firebase";
+import { loadFirebase } from "../lib/firebase";
 
 export default function FirebaseInit() {
   useEffect(() => {
-    initFirebase();
+    // Load Firebase only in the browser.
+    loadFirebase().catch(() => {
+      console.warn("Firebase failed to initialize – ignored in dev.");
+    });
   }, []);
 
   return null;
