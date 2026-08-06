@@ -147,8 +147,13 @@ def run_inference(image_path: str) -> dict:
                 model.zero_grad()
                 out_grad = model(input_tensor)
 
-                fracture_idx = model.pathologies.index("Fracture") if "Fracture" in model.pathologies else 0
-                target_score = out_grad[0][fracture_idx]
+                # Determine target class for Grad-CAM – prefer Osteoporosis if available
+                if "Osteoporosis" in model.pathologies:
+                    target_idx = model.pathologies.index("Osteoporosis")
+                else:
+                    # Fallback to the highest‑scoring pathology
+                    target_idx = int(np.argmax(scores))
+                target_score = out_grad[0][target_idx]
                 target_score.backward()
 
                 from backend.services.file_service import BASE_UPLOAD_DIR
@@ -175,32 +180,42 @@ def run_inference(image_path: str) -> dict:
                     if cam.max() > 0:
                         cam = cam / cam.max()
 
-                    cam = np.power(cam, 0.85)
+                    from scipy.ndimage import gaussian_filter
+                    cam = gaussian_filter(cam, sigma=1)
 
-                    pil_cam = Image.fromarray((cam * 255).astype("uint8")).resize((224, 224), resample=Image.BILINEAR)
-                    cam_resized = np.array(pil_cam).astype("float32") / 255.0
+                    # Resize heatmap to original image dimensions for accurate overlay
+                    orig_h, orig_w = raw_img.shape[:2]
+                    cam_resized_full = np.array(
+                        Image.fromarray((cam * 255).astype("uint8")).resize(
+                            (orig_w, orig_h), resample=Image.BILINEAR
+                        )
+                    ).astype("float32") / 255.0
 
-                    heatmap_file = heatmap_dir / f"{stem}_xai_gradcam.png"
-                    overlay_file = heatmap_dir / f"{stem}_xai_overlay.png"
+                    # Save full‑size heatmap
+                    heatmap_file = heatmap_dir / f"{stem}_xai_gradcam_full.png"
+                    plt.imsave(str(heatmap_file), cam_resized_full, cmap="jet")
 
-                    plt.imsave(str(heatmap_file), cam_resized, cmap="jet")
+                    # Prepare background image (original, normalized) – use arr_norm which is already normalized to [0,1]
+                    input_rgb_full = np.stack([arr_norm] * 3, axis=-1)
 
-                    input_img_np = tensor[0].detach().cpu().numpy()
-                    input_img_np = (input_img_np - input_img_np.min()) / (input_img_np.max() - input_img_np.min() + 1e-8)
-                    input_rgb = np.stack([input_img_np]*3, axis=-1)
-
+                    # Colour‑map the heatmap
                     cmap_jet = plt.get_cmap("jet")
-                    cam_rgb = cmap_jet(cam_resized)[:, :, :3]
+                    cam_rgb_full = cmap_jet(cam_resized_full)[:, :, :3]
 
-                    blended = 0.50 * input_rgb + 0.50 * cam_rgb
-                    blended = np.clip(blended, 0.0, 1.0)
-                    plt.imsave(str(overlay_file), blended)
+                    # Blend with stronger heatmap emphasis
+                    blended_full = 0.40 * input_rgb_full + 0.60 * cam_rgb_full
+                    blended_full = np.clip(blended_full, 0.0, 1.0)
 
+                    # Save full‑size overlay
+                    overlay_file = heatmap_dir / f"{stem}_xai_overlay_full.png"
+                    plt.imsave(str(overlay_file), blended_full)
+
+                    # Use the full‑size URLs for downstream API response
                     heatmap_url = f"/uploads/{patient_id}/heatmaps/{heatmap_file.name}"
                     overlay_url = f"/uploads/{patient_id}/heatmaps/{overlay_file.name}"
 
-                h1.remove()
-                h2.remove()
+                    h1.remove()
+                    h2.remove()
 
         except Exception as xai_err:
             print(f"XAI generation warning: {xai_err}")

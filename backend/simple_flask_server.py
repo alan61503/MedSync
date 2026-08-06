@@ -280,7 +280,8 @@ def run_inference_endpoint():
     image_url = payload.get('image_url')
     if not image_url:
         return jsonify({"error": "image_url required"}), 400
-    
+
+    # Resolve the absolute file path for the uploaded image
     if isinstance(image_url, str) and image_url.startswith('http'):
         parts = image_url.split('/uploads/')
         if len(parts) > 1:
@@ -297,6 +298,43 @@ def run_inference_endpoint():
         from backend.services.xray_service import run_inference
         res = run_inference(file_path)
         return jsonify(res)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ---------------------------------------------------------------------------
+# NEW: Model evaluation endpoint
+# ---------------------------------------------------------------------------
+@app.route('/api/evaluate', methods=['POST'])
+def evaluate_model():
+    """Accept ground‑truth labels and predicted scores to return evaluation metrics.
+
+    Expected JSON payload:
+    {
+        "true_labels": [0, 1, 0, ...],
+        "pred_scores": [0.23, 0.78, 0.11, ...]
+    }
+    """
+    payload = request.get_json() or {}
+    true = payload.get('true_labels')
+    pred = payload.get('pred_scores')
+    if true is None or pred is None:
+        return jsonify({"error": "true_labels and pred_scores are required"}), 400
+    try:
+        import numpy as np
+        true_arr = np.array(true, dtype=float)
+        pred_arr = np.array(pred, dtype=float)
+    except Exception as e:
+        return jsonify({"error": f"Invalid array data: {e}"}), 400
+
+    try:
+        from backend.evaluation import compute_metrics, calibration_curve, save_calibration_plot
+        metrics = compute_metrics(true_arr, pred_arr)
+        calib_data = calibration_curve(true_arr, pred_arr)
+        # Save calibration plot to a temporary file inside outputs directory
+        plot_path = Path('backend/outputs') / f'calibration_{int(np.random.rand()*1e6)}.png'
+        save_calibration_plot(calib_data, plot_path)
+        metrics['calibration_plot'] = str(plot_path)
+        return jsonify(metrics)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

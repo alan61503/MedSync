@@ -1,0 +1,8 @@
+patient_id,image_filename,true_score
+alannn_ee0e91,X-ray-of-both-knees-showing-osteoporosis.webp,0.09032849669456483
+alan_516f5d,images (1).jpg,0.103737211227417
+alan_516f5d,images.jpg,0.14875245094299316
+alan_516f5d,X-ray-of-both-knees-showing-osteoporosis.webp,0.09032849669456483
+testpatient,sample_xray.png,0.8679258187839878
+testpatient_682e5a,sample_xray.png,0.8679258187839878
+testpatient_682e5a,X-ray-of-both-knees-showing-osteoporosis.webp,0.09032849669456483
