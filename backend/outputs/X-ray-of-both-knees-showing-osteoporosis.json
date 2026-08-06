@@ -1,25 +1,25 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.10049471855163575,
-    "percentage": 10.0,
+    "score": 0.09032849669456483,
+    "percentage": 9.0,
     "risk_level": "Low Risk (Normal BMD)",
     "risk_color": "green",
     "clinical_notes": "Bone cortical thickness and trabecular microarchitecture parameters are within normal reference limits."
   },
   "predictions": {
-    "osteoporosis": 0.10049471855163575,
+    "osteoporosis": 0.09032849669456483,
     "cortical_thinning": 0.0,
     "trabecular_degradation": 0.0,
-    "fracture_risk": 0.5024735927581787
+    "fracture_risk": 0.4516424834728241
   },
   "supporting_findings": {
     "Cortical Bone Thinning": 0.0,
     "Trabecular Microarchitecture Degradation": 0.0,
-    "Bone Mineral Density (BMD) Attenuation": 0.1,
-    "Fragility Fracture Indicator": 0.502
+    "Bone Mineral Density (BMD) Attenuation": 0.09,
+    "Fragility Fracture Indicator": 0.452
   },
-  "heatmap_path": "/uploads/testpatient/heatmaps/xray_xai_gradcam.png",
-  "overlay_path": "/uploads/testpatient/heatmaps/xray_xai_overlay.png",
+  "heatmap_path": "/uploads/fdxgcb_11d038/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_gradcam.png",
+  "overlay_path": "/uploads/fdxgcb_11d038/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_overlay.png",
   "xai_status": "Explainable AI Grad-CAM generated successfully"
 }
