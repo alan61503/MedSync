@@ -5,10 +5,17 @@ import os
 
 from .. import models, schemas
 from ..db import get_db, engine
-from ..services.file_service import save_file, detect_modality, is_dicom_file, BASE_UPLOAD_DIR
+from ..services.ct_bone_service import run_ct_bmd
+from ..services.dxa_service import run_dxa_bmd
+from ..services.llm_service import verify_inference
+from ..services.file_service import save_file, detect_modality, BASE_UPLOAD_DIR
+from ..services.inference_service import run_routed_inference
+# duplicate import removed
+# duplicate import removed
+# verify_inference import retained above, duplicate removed
+from ..models import BMDResult
 from ..services.report_service import extract_text_from_pdf
 from ..services.xray_service import run_inference
-from ..services.xray_service import run_inference as generate_osteoporosis_report
 import json
 import shutil
 from pathlib import Path
@@ -24,7 +31,61 @@ def _public_upload_url(file_path: str) -> str:
         return file_path
 
 
-@router.post("/patients", response_model=schemas.PatientOut)
+
+@router.post("/patients/{patient_id}/ct-bmd")
+def ct_bmd_endpoint(patient_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Upload a CT file for a patient, compute BMD, store result, run verification, and return data."""
+    patient = db.get(models.Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    # Save file
+    saved_path = save_file(patient_id, "ct", file.filename, file.file)
+    # Run BMD inference
+    result = run_ct_bmd(saved_path)
+    # Run LLM verification (fallback if API unavailable)
+    verification = verify_inference({"predictions": {}, "supporting_findings": {}})
+    # Persist BMDResult
+    bmd_record = BMDResult(
+        patient_id=patient_id,
+        modality="CT",
+        bmd=str(result.get("bmd")),
+        t_score=str(result.get("t_score")),
+        risk_level=result.get("risk_level"),
+        diagnostic=result.get("diagnostic"),
+        verification=verification.get("verdict")
+    )
+    db.add(bmd_record)
+    db.commit()
+    db.refresh(bmd_record)
+    # Combine result
+    result["verification"] = verification
+    result["bmd_record_id"] = bmd_record.id
+    return result
+
+@router.post("/patients/{patient_id}/dxa-bmd")
+def dxa_bmd_endpoint(patient_id: str, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Upload a DXA file for a patient, compute BMD, store result, run verification, and return data."""
+    patient = db.get(models.Patient, patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found")
+    saved_path = save_file(patient_id, "dxa", file.filename, file.file)
+    result = run_dxa_bmd(saved_path)
+    verification = verify_inference({"predictions": {}, "supporting_findings": {}})
+    bmd_record = BMDResult(
+        patient_id=patient_id,
+        modality="DXA",
+        bmd=str(result.get("bmd")),
+        t_score=str(result.get("t_score")),
+        risk_level=result.get("risk_level"),
+        diagnostic=result.get("diagnostic"),
+        verification=verification.get("verdict")
+    )
+    db.add(bmd_record)
+    db.commit()
+    db.refresh(bmd_record)
+    result["verification"] = verification
+    result["bmd_record_id"] = bmd_record.id
+    return result
 def create_patient(payload: schemas.PatientCreate, db: Session = Depends(get_db)):
     patient = models.Patient(
         name=payload.name,
@@ -58,6 +119,8 @@ def upload_image(patient_id: str, files: List[UploadFile] = File(...), db: Sessi
         m = modality.upper() if modality else "UNKNOWN"
         if m in ["CT"]:
             category = "ct"
+        elif m in ["DXA"]:
+            category = "dxa"
         elif m in ["MR"]:
             category = "mri"
         else:
@@ -72,7 +135,7 @@ def upload_image(patient_id: str, files: List[UploadFile] = File(...), db: Sessi
             path = str(final_path)
 
         # run inference (best-effort)
-        inference = run_inference(path)
+        inference = run_routed_inference(path)
 
         # persist inference next to the image
         try:
@@ -127,7 +190,7 @@ def osteoporosis_report(patient_id: str, file: UploadFile = File(...), db: Sessi
         os.replace(path, str(final_path))
         path = str(final_path)
 
-    inference = run_inference(path)
+    inference = run_routed_inference(path)
     # call LLM (will fallback to offline report if groq fails)
     llm = __import__("services.llm_service", fromlist=["analyse"]).analyse(inference.get("predictions", {}), inference.get("confidence_scores", {}), {"heatmap": inference.get("heatmap_path")})
 
@@ -141,6 +204,18 @@ def osteoporosis_report(patient_id: str, file: UploadFile = File(...), db: Sessi
         pass
 
     return {"inference": inference, "llm": llm}
+
+
+@router.post("/run-inference")
+def run_inference_endpoint(payload: dict):
+    image_url = payload.get("image_url")
+    if not image_url:
+        raise HTTPException(status_code=400, detail="image_url required")
+
+    try:
+        return run_routed_inference(image_url)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 @router.post("/patients/{patient_id}/upload-report")
@@ -180,6 +255,7 @@ def patients_summary(db: Session = Depends(get_db)):
         total_images = len(p.images)
         xrays = sum(1 for i in p.images if (i.modality or "").upper() not in ("CT", "MR"))
         ct = sum(1 for i in p.images if (i.modality or "").upper() == "CT")
+        dxa = sum(1 for i in p.images if (i.modality or "").upper() == "DXA")
         mri = sum(1 for i in p.images if (i.modality or "").upper() == "MR")
         total_reports = len(p.reports)
         # completeness based on simple heuristic
@@ -196,6 +272,7 @@ def patients_summary(db: Session = Depends(get_db)):
                 "name": p.name,
                 "xrays": xrays,
                 "ct": ct,
+                "dxa": dxa,
                 "mri": mri,
                 "reports": total_reports,
                 "completion": completion,

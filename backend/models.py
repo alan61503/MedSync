@@ -20,6 +20,7 @@ class Patient(Base):
 
     images = relationship("MedicalImage", back_populates="patient", cascade="all, delete-orphan")
     reports = relationship("RadiologyReport", back_populates="patient", cascade="all, delete-orphan")
+    bmd_results = relationship("BMDResult", back_populates="patient", cascade="all, delete-orphan")
 
 
 class MedicalImage(Base):
@@ -44,3 +45,17 @@ class RadiologyReport(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     patient = relationship("Patient", back_populates="reports")
+
+class BMDResult(Base):
+    __tablename__ = "bmd_results"
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    patient_id = Column(String, ForeignKey("patients.id"), nullable=False)
+    modality = Column(String, nullable=False)  # "CT" or "DXA"
+    bmd = Column(String)  # store as string for simplicity
+    t_score = Column(String)
+    risk_level = Column(String)
+    diagnostic = Column(String, nullable=True)
+    verification = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    patient = relationship("Patient", back_populates="bmd_results")

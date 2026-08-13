@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from .db import engine, Base
 from .api import patients
+from .api import ct_router, dxa_router
 from pathlib import Path
 from .services.file_service import BASE_UPLOAD_DIR
 
@@ -26,34 +27,14 @@ def on_startup():
 
 
 app.include_router(patients.router, prefix="/api")
+app.include_router(ct_router.router, prefix="/api")
+app.include_router(dxa_router.router, prefix="/api")
 
 # serve uploaded files
 app.mount("/uploads", StaticFiles(directory=str(BASE_UPLOAD_DIR)), name="uploads")
 
 
-@app.post("/api/run-inference")
-def run_inference_endpoint(payload: dict):
-    image_url = payload.get("image_url")
-    if not image_url:
-        raise HTTPException(status_code=400, detail="image_url required")
 
-    # convert URL to file path if it starts with the server host
-    if isinstance(image_url, str) and image_url.startswith("http"):
-        parts = image_url.split("/uploads/")
-        if len(parts) > 1:
-            rel = parts[1]
-            file_path = str(BASE_UPLOAD_DIR / rel)
-        else:
-            file_path = image_url
-    elif isinstance(image_url, str) and image_url.startswith("/uploads"):
-        file_path = str(BASE_UPLOAD_DIR / image_url.removeprefix("/uploads/").lstrip("/"))
-    else:
-        file_path = image_url
-
-    from .services.xray_service import run_inference
-
-    res = run_inference(file_path)
-    return res
 
 
 @app.post("/api/ai-verify")

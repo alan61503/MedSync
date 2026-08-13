@@ -1,0 +1,9 @@
+fastapi==0.111.0
+uvicorn
+pydantic==2.8.2
+monai
+SimpleITK
+pydicom
+
+python-multipart
+sqlalchemy>=2.0.31

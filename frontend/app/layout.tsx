@@ -42,6 +42,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 AI Model Active
               </div>
+              <Link href="/ct-bmd" className="hover:text-indigo-600 transition px-3 py-1.5 rounded-lg hover:bg-slate-100">
+                CT BMD
+              </Link>
+              <Link href="/dxa-bmd" className="hover:text-indigo-600 transition px-3 py-1.5 rounded-lg hover:bg-slate-100">
+                DXA BMD
+              </Link>
             </nav>
           </div>
         </header>

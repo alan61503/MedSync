@@ -11,15 +11,15 @@
     "osteoporosis": 0.7700000000000001,
     "cortical_thinning": 0.78,
     "trabecular_degradation": 0.82,
-    "fracture_risk": 0.4516424834728241
+    "fracture_risk": 0.25
   },
   "supporting_findings": {
     "Cortical Bone Thinning": 0.78,
     "Trabecular Microarchitecture Degradation": 0.82,
     "Bone Mineral Density (BMD) Attenuation": 0.77,
-    "Fragility Fracture Indicator": 0.452
+    "Fragility Fracture Indicator": 0.25
   },
-  "heatmap_path": "/uploads/testpatient/heatmaps/sample_xray_gradcam.png",
-  "overlay_path": "",
+  "heatmap_path": "/uploads/testpatient_682e5a/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_gradcam_full.png",
+  "overlay_path": "/uploads/testpatient_682e5a/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_overlay_full.png",
   "xai_status": "Explainable AI Grad-CAM generated successfully"
 }

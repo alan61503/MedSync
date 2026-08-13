@@ -135,11 +135,19 @@ export default function PatientPage() {
         body: JSON.stringify({ image_url: fullUrl }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || data.error || `HTTP ${res.status}`);
+      }
       if (data && !data.error) {
         setInference(data);
+      } else {
+        setInference(null);
+        showStatus(data.error || "Inference failed.");
       }
     } catch (err) {
       console.error("Inference error:", err);
+      setInference(null);
+      showStatus(err instanceof Error ? err.message : "Inference failed.");
     } finally {
       setLoadingInference(false);
     }

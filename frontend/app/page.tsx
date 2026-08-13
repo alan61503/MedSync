@@ -9,6 +9,9 @@ type Summary = {
   age?: number;
   gender?: string;
   xrays: number;
+  ct?: number;
+  dxa?: number;
+  mri?: number;
   reports: number;
   completion: number;
   risk_level?: string;
@@ -77,6 +80,9 @@ export default function Page() {
           age: newPatient.age,
           gender: newPatient.gender,
           xrays: 0,
+          ct: 0,
+          dxa: 0,
+          mri: 0,
           reports: 0,
           completion: 25,
           risk_level: "Pending Scan",
@@ -119,7 +125,7 @@ export default function Page() {
   // Metrics
   const totalPatients = patients.length;
   const highRiskCount = patients.filter((p) => p.risk_level === "High Risk").length;
-  const totalScans = patients.reduce((acc, p) => acc + (p.xrays || 0), 0);
+  const totalScans = patients.reduce((acc, p) => acc + (p.xrays || 0) + (p.ct || 0) + (p.dxa || 0) + (p.mri || 0), 0);
 
   // Filter & Sort
   const filteredPatients = patients
@@ -133,7 +139,7 @@ export default function Page() {
     .sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "age") return (b.age || 0) - (a.age || 0);
-      if (sortBy === "scans") return (b.xrays || 0) - (a.xrays || 0);
+      if (sortBy === "scans") return ((b.xrays || 0) + (b.ct || 0) + (b.dxa || 0) + (b.mri || 0)) - ((a.xrays || 0) + (a.ct || 0) + (a.dxa || 0) + (a.mri || 0));
       if (sortBy === "risk") return (b.risk_score || 0) - (a.risk_score || 0);
       return 0;
     });
@@ -351,7 +357,7 @@ export default function Page() {
 
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                   <div className="text-xs text-slate-500 font-medium flex items-center gap-3">
-                    <span>📷 {p.xrays} Scan{p.xrays !== 1 ? "s" : ""}</span>
+                    <span>📷 {(p.xrays || 0) + (p.ct || 0) + (p.dxa || 0) + (p.mri || 0)} Scan{((p.xrays || 0) + (p.ct || 0) + (p.dxa || 0) + (p.mri || 0)) !== 1 ? "s" : ""}</span>
                     {p.t_score !== undefined && (
                       <span className="font-mono text-slate-600">T: {p.t_score} SD</span>
                     )}

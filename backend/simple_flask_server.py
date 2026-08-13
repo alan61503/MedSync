@@ -174,8 +174,9 @@ def upload_image(patient_id):
         dest = target_dir / f.filename
         f.save(dest)
         try:
-            from backend.services.xray_service import run_inference
-            inf = run_inference(str(dest))
+            from backend.services.inference_service import run_routed_inference
+
+            inf = run_routed_inference(str(dest))
         except Exception as e:
             inf = {"error": str(e)}
         try:
@@ -295,8 +296,9 @@ def run_inference_endpoint():
         file_path = image_url
 
     try:
-        from backend.services.xray_service import run_inference
-        res = run_inference(file_path)
+        from backend.services.inference_service import run_routed_inference
+
+        res = run_routed_inference(file_path)
         return jsonify(res)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
