@@ -1,25 +1,25 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.6546605608658865,
-    "percentage": 65.5,
-    "risk_level": "High Risk (Osteoporosis)",
-    "risk_color": "red",
-    "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
+    "score": 0.5693989192601294,
+    "percentage": 56.9,
+    "risk_level": "Moderate Risk (Osteopenia)",
+    "risk_color": "amber",
+    "clinical_notes": "Moderate reduction in bone trabecular density observed. Annual DEXA tracking and calcium/vitamin D supplementation advised."
   },
   "predictions": {
-    "osteoporosis": 0.6546605608658865,
-    "cortical_thinning": 0.5528330095112324,
-    "trabecular_degradation": 0.863281415309757,
-    "fracture_risk": 0.518686056137085
+    "osteoporosis": 0.5693989192601294,
+    "cortical_thinning": 0.5098600164055824,
+    "trabecular_degradation": 0.8284626053646207,
+    "fracture_risk": 0.25
   },
   "supporting_findings": {
-    "Cortical Bone Thinning": 0.553,
-    "Trabecular Microarchitecture Degradation": 0.863,
-    "Bone Mineral Density (BMD) Attenuation": 0.655,
-    "Fragility Fracture Indicator": 0.519
+    "Cortical Bone Thinning": 0.51,
+    "Trabecular Microarchitecture Degradation": 0.828,
+    "Bone Mineral Density (BMD) Attenuation": 0.569,
+    "Fragility Fracture Indicator": 0.25
   },
-  "heatmap_path": "/uploads/testpatient/heatmaps/sample_xray_gradcam.png",
-  "overlay_path": "",
+  "heatmap_path": "/uploads/alan_516f5d/heatmaps/images (1)_xai_gradcam_full.png",
+  "overlay_path": "/uploads/alan_516f5d/heatmaps/images (1)_xai_overlay_full.png",
   "xai_status": "Explainable AI Grad-CAM generated successfully"
 }
