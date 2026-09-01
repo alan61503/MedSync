@@ -1,23 +1,38 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.16999999999999998,
-    "percentage": 17.0,
+    "score": 0.157,
+    "percentage": 15.7,
     "risk_level": "Low Risk (Normal BMD)",
     "risk_color": "green",
     "clinical_notes": "Bone cortical thickness and trabecular microarchitecture parameters are within normal reference limits."
   },
   "predictions": {
-    "osteoporosis": 0.16999999999999998,
-    "cortical_thinning": 0.15,
-    "trabecular_degradation": 0.15,
-    "fracture_risk": 0.25
+    "osteoporosis": 0.157,
+    "cortical_thinning": 0.1,
+    "trabecular_degradation": 0.1,
+    "fracture_risk": 0.498,
+    "Atelectasis": 0.4986,
+    "Cardiomegaly": 0.4952,
+    "Effusion": 0.5045,
+    "Infiltration": 0.5016,
+    "Mass": 0.4995,
+    "Nodule": 0.5036,
+    "Pneumonia": 0.5021,
+    "Pneumothorax": 0.5026,
+    "Consolidation": 0.5021,
+    "Edema": 0.4975,
+    "Emphysema": 0.5052,
+    "Fibrosis": 0.4957,
+    "Pleural_Thickening": 0.4982,
+    "Hernia": 0.4992,
+    "Fracture": 0.4983
   },
   "supporting_findings": {
-    "Cortical Bone Thinning": 0.15,
-    "Trabecular Microarchitecture Degradation": 0.15,
-    "Bone Mineral Density (BMD) Attenuation": 0.17,
-    "Fragility Fracture Indicator": 0.25
+    "Cortical Bone Thinning": 0.1,
+    "Trabecular Microarchitecture Degradation": 0.1,
+    "Bone Mineral Density (BMD) Attenuation": 0.285,
+    "Fragility Fracture Indicator": 0.498
   },
   "heatmap_path": "/uploads/alan_516f5d/heatmaps/x-ray_xai_gradcam_full.png",
   "overlay_path": "/uploads/alan_516f5d/heatmaps/x-ray_xai_overlay_full.png",

@@ -1,0 +1,43 @@
+\begin{table*}[t]
+\centering
+\caption{Comprehensive Diagnostic Performance and Statistical Evaluation of MedSync Models Across Datasets.}
+\label{tab:medsync_evaluation}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Dataset Cohort} & \textbf{Sample Size (N)} & \textbf{Accuracy (\%)} & \textbf{Balanced Acc (\%)} & \textbf{Macro F1} & \textbf{ROC-AUC (OvR)} & \textbf{Cohen's $\kappa$} \\
+\midrule
+Primary Clinical Knee Cohort & 239 & 46.86 & 36.06 & 0.3082 & 0.5140 & 0.0328 \\
+Expanded Multi-Cohort Benchmark & 1198 & 35.31 & 38.31 & 0.2676 & 0.7113 & 0.0758 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{table}[h]
+\centering
+\caption{Per-Class Diagnostic Performance on Primary Clinical Knee Cohort (N=239).}
+\label{tab:per_class_clinical}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Diagnostic Category} & \textbf{Sensitivity (\%)} & \textbf{Specificity (\%)} & \textbf{PPV (\%)} & \textbf{F1-Score} \\
+\midrule
+Normal BMD & 44.44 & 62.56 & 17.39 & 0.2500 \\
+Osteopenia & 61.69 & 41.18 & 65.52 & 0.6355 \\
+Osteoporosis & 2.04 & 99.47 & 50.00 & 0.0392 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Per-Class Diagnostic Sensitivity, Specificity, and Positive Predictive Value (PPV) on Expanded Benchmark (N=1198).}
+\label{tab:per_class_metrics}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Diagnostic Category} & \textbf{Sensitivity (\%)} & \textbf{Specificity (\%)} & \textbf{PPV (\%)} & \textbf{F1-Score} \\
+\midrule
+Normal BMD & 90.74 & 19.91 & 29.58 & 0.4461 \\
+Osteopenia & 23.61 & 89.24 & 64.14 & 0.3451 \\
+Osteoporosis & 0.60 & 99.54 & 33.33 & 0.0117 \\
+\bottomrule
+\end{tabular}
+\end{table}

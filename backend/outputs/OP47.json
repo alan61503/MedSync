@@ -1,0 +1,40 @@
+{
+  "disease": "Osteoporosis",
+  "osteoporosis": {
+    "score": 0.41,
+    "percentage": 41.0,
+    "risk_level": "Moderate Risk (Osteopenia)",
+    "risk_color": "amber",
+    "clinical_notes": "Moderate reduction in bone trabecular density observed. Annual DEXA tracking and calcium/vitamin D supplementation advised."
+  },
+  "predictions": {
+    "osteoporosis": 0.41,
+    "cortical_thinning": 0.412,
+    "trabecular_degradation": 0.423,
+    "fracture_risk": 0.478,
+    "Atelectasis": 0.5127,
+    "Cardiomegaly": 0.4678,
+    "Effusion": 0.4917,
+    "Infiltration": 0.5001,
+    "Mass": 0.4991,
+    "Nodule": 0.5107,
+    "Pneumonia": 0.4558,
+    "Pneumothorax": 0.5093,
+    "Consolidation": 0.5178,
+    "Edema": 0.512,
+    "Emphysema": 0.5047,
+    "Fibrosis": 0.497,
+    "Pleural_Thickening": 0.5338,
+    "Hernia": 0.5122,
+    "Fracture": 0.4784
+  },
+  "supporting_findings": {
+    "Cortical Bone Thinning": 0.412,
+    "Trabecular Microarchitecture Degradation": 0.423,
+    "Bone Mineral Density (BMD) Attenuation": 0.368,
+    "Fragility Fracture Indicator": 0.478
+  },
+  "heatmap_path": "/uploads/testpatient/heatmaps/OP47_xai_gradcam_full.png",
+  "overlay_path": "/uploads/testpatient/heatmaps/OP47_xai_overlay_full.png",
+  "xai_status": "Explainable AI Grad-CAM generated successfully"
+}

@@ -34,7 +34,14 @@ app.include_router(dxa_router.router, prefix="/api")
 app.mount("/uploads", StaticFiles(directory=str(BASE_UPLOAD_DIR)), name="uploads")
 
 
+@app.post("/api/evaluate/xray-benchmark")
+def evaluate_xray_benchmark_endpoint():
+    from .evaluation.xray_benchmark import evaluate_xray_benchmark
 
+    try:
+        return evaluate_xray_benchmark()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
 
 
 @app.post("/api/ai-verify")

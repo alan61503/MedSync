@@ -1,0 +1,40 @@
+{
+  "disease": "Osteoporosis",
+  "osteoporosis": {
+    "score": 0.216,
+    "percentage": 21.6,
+    "risk_level": "Low Risk (Normal BMD)",
+    "risk_color": "green",
+    "clinical_notes": "Bone cortical thickness and trabecular microarchitecture parameters are within normal reference limits."
+  },
+  "predictions": {
+    "osteoporosis": 0.216,
+    "cortical_thinning": 0.1,
+    "trabecular_degradation": 0.286,
+    "fracture_risk": 0.538,
+    "Atelectasis": 0.5089,
+    "Cardiomegaly": 0.5222,
+    "Effusion": 0.4726,
+    "Infiltration": 0.5094,
+    "Mass": 0.5446,
+    "Nodule": 0.4997,
+    "Pneumonia": 0.4875,
+    "Pneumothorax": 0.5031,
+    "Consolidation": 0.4978,
+    "Edema": 0.48,
+    "Emphysema": 0.487,
+    "Fibrosis": 0.5323,
+    "Pleural_Thickening": 0.5014,
+    "Hernia": 0.5414,
+    "Fracture": 0.5378
+  },
+  "supporting_findings": {
+    "Cortical Bone Thinning": 0.1,
+    "Trabecular Microarchitecture Degradation": 0.286,
+    "Bone Mineral Density (BMD) Attenuation": 0.246,
+    "Fragility Fracture Indicator": 0.538
+  },
+  "heatmap_path": "/uploads/testpatient/heatmaps/benchmark_normal_00308_xai_gradcam_full.png",
+  "overlay_path": "/uploads/testpatient/heatmaps/benchmark_normal_00308_xai_overlay_full.png",
+  "xai_status": "Explainable AI Grad-CAM generated successfully"
+}

@@ -1,0 +1,37 @@
+MedSync X-ray Osteoporosis Benchmark Evaluation
+========================================================================
+Model: ResNet-50
+Dataset: expanded_benchmark
+Images evaluated: 660
+Normal images: 324
+Osteoporosis images: 336
+
+Primary metrics:
+  Accuracy:   0.4955
+  Precision:  0.5484
+  Recall:     0.0506
+  Specificity: 0.9568
+  F1-score:   0.0926
+  ROC-AUC:    0.8947
+
+Confusion matrix: [[310, 14], [319, 17]]
+TP/TN/FP/FN: 17/310/14/319
+
+Data leakage and overlap check:
+  Training-set overlap could not be independently verified.
+  No training configuration or explicit dataset manifest was found in the repository to confirm independence.
+
+Published benchmark comparison (ResNet-50 paper):
+Metric | Published ResNet-50 | Our Model | Difference
+Accuracy | 0.900 | 0.495 | -0.405
+Precision | 0.890 | 0.548 | -0.342
+Recall | 0.890 | 0.051 | -0.839
+F1 | 0.890 | 0.093 | -0.797
+ROC-AUC | N/A | 0.895 | N/A
+
+Metric | Published ResNet-50 | Our Model | Difference
+Accuracy | 0.900 | 0.495 | -0.405
+Precision | 0.890 | 0.548 | -0.342
+Recall | 0.890 | 0.051 | -0.839
+F1 | 0.890 | 0.093 | -0.797
+ROC-AUC | N/A | 0.895 | N/A

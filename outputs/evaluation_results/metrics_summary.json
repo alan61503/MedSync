@@ -1,0 +1,188 @@
+{
+  "primary_clinical_cohort": {
+    "cohort": "Primary Clinical Cohort",
+    "sample_size": 239,
+    "classification": {
+      "accuracy": 0.4686,
+      "balanced_accuracy": 0.3606,
+      "f1_macro": 0.3082,
+      "f1_weighted": 0.4552,
+      "cohen_kappa": 0.0328,
+      "mcc": 0.0359,
+      "roc_auc_ovr": 0.514,
+      "pr_auc": {
+        "Normal BMD": 0.19453819347037832,
+        "Osteopenia": 0.6348655774918015,
+        "Osteoporosis": 0.22867883969157982
+      },
+      "brier_score": null,
+      "confusion_matrix": [
+        [
+          16,
+          20,
+          0
+        ],
+        [
+          58,
+          95,
+          1
+        ],
+        [
+          18,
+          30,
+          1
+        ]
+      ],
+      "per_class": {
+        "Normal BMD": {
+          "sensitivity_recall": 0.4444,
+          "specificity": 0.6256,
+          "precision_ppv": 0.1739,
+          "npv": 0.8639,
+          "f1_score": 0.25,
+          "true_positives": 16,
+          "false_positives": 76,
+          "true_negatives": 127,
+          "false_negatives": 20
+        },
+        "Osteopenia": {
+          "sensitivity_recall": 0.6169,
+          "specificity": 0.4118,
+          "precision_ppv": 0.6552,
+          "npv": 0.3723,
+          "f1_score": 0.6355,
+          "true_positives": 95,
+          "false_positives": 50,
+          "true_negatives": 35,
+          "false_negatives": 59
+        },
+        "Osteoporosis": {
+          "sensitivity_recall": 0.0204,
+          "specificity": 0.9947,
+          "precision_ppv": 0.5,
+          "npv": 0.7975,
+          "f1_score": 0.0392,
+          "true_positives": 1,
+          "false_positives": 1,
+          "true_negatives": 189,
+          "false_negatives": 48
+        }
+      }
+    },
+    "regression": {
+      "mae": 0.9867,
+      "rmse": 1.2124,
+      "r2_score": -1.268,
+      "pearson_r": 0.0809,
+      "pearson_pvalue": 0.21274275867437664,
+      "spearman_rho": 0.0492,
+      "spearman_pvalue": 0.44891859753920516,
+      "bland_altman": {
+        "mean_bias": 0.7961,
+        "std_diff": 0.9144,
+        "loa_95_upper": 2.5883,
+        "loa_95_lower": -0.9962
+      }
+    }
+  },
+  "expanded_benchmark_cohort": {
+    "cohort": "Expanded Benchmark",
+    "sample_size": 1198,
+    "classification": {
+      "accuracy": 0.3531,
+      "balanced_accuracy": 0.3831,
+      "f1_macro": 0.2676,
+      "f1_weighted": 0.2789,
+      "cohen_kappa": 0.0758,
+      "mcc": 0.1238,
+      "roc_auc_ovr": 0.7113,
+      "pr_auc": {
+        "Normal BMD": 0.7056371240590781,
+        "Osteopenia": 0.4863308295554814,
+        "Osteoporosis": 0.4708707858525989
+      },
+      "brier_score": null,
+      "confusion_matrix": [
+        [
+          294,
+          29,
+          1
+        ],
+        [
+          408,
+          127,
+          3
+        ],
+        [
+          292,
+          42,
+          2
+        ]
+      ],
+      "per_class": {
+        "Normal BMD": {
+          "sensitivity_recall": 0.9074,
+          "specificity": 0.1991,
+          "precision_ppv": 0.2958,
+          "npv": 0.8529,
+          "f1_score": 0.4461,
+          "true_positives": 294,
+          "false_positives": 700,
+          "true_negatives": 174,
+          "false_negatives": 30
+        },
+        "Osteopenia": {
+          "sensitivity_recall": 0.2361,
+          "specificity": 0.8924,
+          "precision_ppv": 0.6414,
+          "npv": 0.589,
+          "f1_score": 0.3451,
+          "true_positives": 127,
+          "false_positives": 71,
+          "true_negatives": 589,
+          "false_negatives": 411
+        },
+        "Osteoporosis": {
+          "sensitivity_recall": 0.006,
+          "specificity": 0.9954,
+          "precision_ppv": 0.3333,
+          "npv": 0.7198,
+          "f1_score": 0.0117,
+          "true_positives": 2,
+          "false_positives": 4,
+          "true_negatives": 858,
+          "false_negatives": 334
+        }
+      }
+    },
+    "regression": {
+      "mae": 1.5292,
+      "rmse": 1.8621,
+      "r2_score": -0.4241,
+      "pearson_r": 0.2242,
+      "pearson_pvalue": 4.033184406970813e-15,
+      "spearman_rho": 0.5427,
+      "spearman_pvalue": 1.092090576153924e-92,
+      "bland_altman": {
+        "mean_bias": 1.0674,
+        "std_diff": 1.5258,
+        "loa_95_upper": 4.0579,
+        "loa_95_lower": -1.9231
+      }
+    }
+  },
+  "multimodal_evaluation": {
+    "dxa_eval": {
+      "cases_evaluated": 100,
+      "mean_bmd": 0.88,
+      "mean_t_score": -1.800000000000001,
+      "risk_distribution": {
+        "Moderate Risk (Osteopenia)": 100
+      }
+    },
+    "ct_eval": {
+      "scans_processed": 0,
+      "mean_t_score": -1.5
+    }
+  }
+}

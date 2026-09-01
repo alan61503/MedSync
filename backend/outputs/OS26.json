@@ -1,0 +1,40 @@
+{
+  "disease": "Osteoporosis",
+  "osteoporosis": {
+    "score": 0.651,
+    "percentage": 65.1,
+    "risk_level": "High Risk (Osteoporosis)",
+    "risk_color": "red",
+    "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
+  },
+  "predictions": {
+    "osteoporosis": 0.651,
+    "cortical_thinning": 0.627,
+    "trabecular_degradation": 0.713,
+    "fracture_risk": 0.519,
+    "Atelectasis": 0.5026,
+    "Cardiomegaly": 0.5181,
+    "Effusion": 0.4893,
+    "Infiltration": 0.5144,
+    "Mass": 0.5249,
+    "Nodule": 0.4909,
+    "Pneumonia": 0.4878,
+    "Pneumothorax": 0.4994,
+    "Consolidation": 0.4997,
+    "Edema": 0.4898,
+    "Emphysema": 0.4933,
+    "Fibrosis": 0.5243,
+    "Pleural_Thickening": 0.4954,
+    "Hernia": 0.5266,
+    "Fracture": 0.5191
+  },
+  "supporting_findings": {
+    "Cortical Bone Thinning": 0.627,
+    "Trabecular Microarchitecture Degradation": 0.713,
+    "Bone Mineral Density (BMD) Attenuation": 0.624,
+    "Fragility Fracture Indicator": 0.519
+  },
+  "heatmap_path": "/uploads/testpatient/heatmaps/OS26_xai_gradcam_full.png",
+  "overlay_path": "/uploads/testpatient/heatmaps/OS26_xai_overlay_full.png",
+  "xai_status": "Explainable AI Grad-CAM generated successfully"
+}

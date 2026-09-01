@@ -1,23 +1,38 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.7700000000000001,
-    "percentage": 77.0,
-    "risk_level": "High Risk (Osteoporosis)",
-    "risk_color": "red",
-    "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
+    "score": 0.351,
+    "percentage": 35.1,
+    "risk_level": "Moderate Risk (Osteopenia)",
+    "risk_color": "amber",
+    "clinical_notes": "Moderate reduction in bone trabecular density observed. Annual DEXA tracking and calcium/vitamin D supplementation advised."
   },
   "predictions": {
-    "osteoporosis": 0.7700000000000001,
-    "cortical_thinning": 0.78,
-    "trabecular_degradation": 0.82,
-    "fracture_risk": 0.25
+    "osteoporosis": 0.351,
+    "cortical_thinning": 0.13,
+    "trabecular_degradation": 0.648,
+    "fracture_risk": 0.505,
+    "Atelectasis": 0.4961,
+    "Cardiomegaly": 0.5025,
+    "Effusion": 0.503,
+    "Infiltration": 0.4955,
+    "Mass": 0.4951,
+    "Nodule": 0.4954,
+    "Pneumonia": 0.5009,
+    "Pneumothorax": 0.4952,
+    "Consolidation": 0.499,
+    "Edema": 0.5003,
+    "Emphysema": 0.5013,
+    "Fibrosis": 0.5002,
+    "Pleural_Thickening": 0.4996,
+    "Hernia": 0.4996,
+    "Fracture": 0.505
   },
   "supporting_findings": {
-    "Cortical Bone Thinning": 0.78,
-    "Trabecular Microarchitecture Degradation": 0.82,
-    "Bone Mineral Density (BMD) Attenuation": 0.77,
-    "Fragility Fracture Indicator": 0.25
+    "Cortical Bone Thinning": 0.13,
+    "Trabecular Microarchitecture Degradation": 0.648,
+    "Bone Mineral Density (BMD) Attenuation": 0.236,
+    "Fragility Fracture Indicator": 0.505
   },
   "heatmap_path": "/uploads/alan_516f5d/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_gradcam_full.png",
   "overlay_path": "/uploads/alan_516f5d/heatmaps/X-ray-of-both-knees-showing-osteoporosis_xai_overlay_full.png",
