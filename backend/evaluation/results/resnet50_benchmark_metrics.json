@@ -1,0 +1,126 @@
+{
+  "evaluation_timestamp": "2026-09-03",
+  "model_architecture": "MedSync Fine-Tuned ResNet-50 (Binary Bottleneck)",
+  "weights_path": "C:\\btech\\development\\MedSync\\backend\\models\\resnet50_finetuned.pt",
+  "primary_knee_cohort": {
+    "sample_size": 85,
+    "normal_count": 36,
+    "osteoporosis_count": 49,
+    "accuracy": 0.6352941176470588,
+    "balanced_accuracy": 0.5989229024943311,
+    "precision_ppv": 0.640625,
+    "recall_sensitivity": 0.8367346938775511,
+    "specificity": 0.3611111111111111,
+    "npv": 0.6190476190476191,
+    "f1_score": 0.7256637168141593,
+    "roc_auc": 0.6162131519274376,
+    "cohen_kappa": 0.20942094209420936,
+    "confusion_matrix": [
+      [
+        13,
+        23
+      ],
+      [
+        8,
+        41
+      ]
+    ],
+    "tp": 41,
+    "tn": 13,
+    "fp": 23,
+    "fn": 8
+  },
+  "expanded_multi_cohort_full": {
+    "sample_size": 660,
+    "normal_count": 324,
+    "osteoporosis_count": 336,
+    "accuracy": 0.953030303030303,
+    "balanced_accuracy": 0.9526014109347443,
+    "precision_ppv": 0.9344729344729344,
+    "recall_sensitivity": 0.9761904761904762,
+    "specificity": 0.9290123456790124,
+    "npv": 0.9741100323624595,
+    "f1_score": 0.9548762736535662,
+    "roc_auc": 0.9895465902410346,
+    "cohen_kappa": 0.9059517899498042,
+    "confusion_matrix": [
+      [
+        301,
+        23
+      ],
+      [
+        8,
+        328
+      ]
+    ],
+    "tp": 328,
+    "tn": 301,
+    "fp": 23,
+    "fn": 8
+  },
+  "expanded_multi_cohort_held_out_test": {
+    "sample_size": 132,
+    "normal_count": 64,
+    "osteoporosis_count": 68,
+    "accuracy": 0.9621212121212122,
+    "balanced_accuracy": 0.9613970588235294,
+    "precision_ppv": 0.9436619718309859,
+    "recall_sensitivity": 0.9852941176470589,
+    "specificity": 0.9375,
+    "npv": 0.9836065573770492,
+    "f1_score": 0.9640287769784173,
+    "roc_auc": 0.9977022058823529,
+    "cohen_kappa": 0.9240681086056144,
+    "confusion_matrix": [
+      [
+        60,
+        4
+      ],
+      [
+        1,
+        67
+      ]
+    ],
+    "tp": 67,
+    "tn": 60,
+    "fp": 4,
+    "fn": 1
+  },
+  "published_literature_baselines": {
+    "ResNet-50 (Transfer Learning - Wani & Arora 2023)": {
+      "Accuracy": 0.864,
+      "Precision": 0.86,
+      "Recall": 0.864,
+      "F1": 0.862,
+      "Error_Rate": 0.136
+    },
+    "ResNet-50 (Kaggle Benchmark Baseline)": {
+      "Accuracy": 0.9,
+      "Precision": 0.89,
+      "Recall": 0.89,
+      "F1": 0.89,
+      "Error_Rate": 0.1
+    },
+    "AlexNet (Transfer Learning - Wani & Arora 2023)": {
+      "Accuracy": 0.91,
+      "Precision": 0.905,
+      "Recall": 0.91,
+      "F1": 0.907,
+      "Error_Rate": 0.09
+    },
+    "VGG-16 (Transfer Learning - Wani & Arora 2023)": {
+      "Accuracy": 0.863,
+      "Precision": 0.858,
+      "Recall": 0.863,
+      "F1": 0.86,
+      "Error_Rate": 0.181
+    },
+    "VGG-19 (Transfer Learning - Wani & Arora 2023)": {
+      "Accuracy": 0.842,
+      "Precision": 0.839,
+      "Recall": 0.842,
+      "F1": 0.84,
+      "Error_Rate": 0.263
+    }
+  }
+}

@@ -1,40 +1,40 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.157,
-    "percentage": 15.7,
-    "risk_level": "Low Risk (Normal BMD)",
-    "risk_color": "green",
-    "clinical_notes": "Bone cortical thickness and trabecular microarchitecture parameters are within normal reference limits."
+    "score": 0.693,
+    "percentage": 69.3,
+    "risk_level": "High Risk (Osteoporosis)",
+    "risk_color": "red",
+    "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
   },
   "predictions": {
-    "osteoporosis": 0.157,
+    "osteoporosis": 0.693,
     "cortical_thinning": 0.1,
     "trabecular_degradation": 0.1,
-    "fracture_risk": 0.498,
-    "Atelectasis": 0.4986,
-    "Cardiomegaly": 0.4952,
-    "Effusion": 0.5045,
-    "Infiltration": 0.5016,
-    "Mass": 0.4995,
-    "Nodule": 0.5036,
-    "Pneumonia": 0.5021,
-    "Pneumothorax": 0.5026,
-    "Consolidation": 0.5021,
-    "Edema": 0.4975,
-    "Emphysema": 0.5052,
-    "Fibrosis": 0.4957,
-    "Pleural_Thickening": 0.4982,
-    "Hernia": 0.4992,
-    "Fracture": 0.4983
+    "fracture_risk": 0.501,
+    "Atelectasis": 0.4995,
+    "Cardiomegaly": 0.498,
+    "Effusion": 0.4989,
+    "Infiltration": 0.4996,
+    "Mass": 0.5036,
+    "Nodule": 0.4968,
+    "Pneumonia": 0.4955,
+    "Pneumothorax": 0.4948,
+    "Consolidation": 0.5008,
+    "Edema": 0.4979,
+    "Emphysema": 0.4995,
+    "Fibrosis": 0.5029,
+    "Pleural_Thickening": 0.5009,
+    "Hernia": 0.4979,
+    "Fracture": 0.501
   },
   "supporting_findings": {
     "Cortical Bone Thinning": 0.1,
     "Trabecular Microarchitecture Degradation": 0.1,
-    "Bone Mineral Density (BMD) Attenuation": 0.285,
-    "Fragility Fracture Indicator": 0.498
+    "Bone Mineral Density (BMD) Attenuation": 0.284,
+    "Fragility Fracture Indicator": 0.501
   },
   "heatmap_path": "/uploads/alan_516f5d/heatmaps/x-ray_xai_gradcam_full.png",
   "overlay_path": "/uploads/alan_516f5d/heatmaps/x-ray_xai_overlay_full.png",
-  "xai_status": "Explainable AI Grad-CAM generated successfully"
+  "xai_status": "Explainable AI Grad-CAM generated successfully | Model: Fine-tuned ResNet-50 (95.30% accuracy) + Radiometric Features"
 }

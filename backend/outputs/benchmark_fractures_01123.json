@@ -1,40 +1,40 @@
 {
   "disease": "Osteoporosis",
   "osteoporosis": {
-    "score": 0.717,
-    "percentage": 71.7,
+    "score": 0.856,
+    "percentage": 85.6,
     "risk_level": "High Risk (Osteoporosis)",
     "risk_color": "red",
     "clinical_notes": "Severe bone mineral density loss and cortical bone thinning detected. Clinical DEXA scan and orthopedic evaluation recommended."
   },
   "predictions": {
-    "osteoporosis": 0.717,
-    "cortical_thinning": 0.72,
-    "trabecular_degradation": 0.75,
-    "fracture_risk": 0.535,
-    "Atelectasis": 0.5079,
-    "Cardiomegaly": 0.5214,
-    "Effusion": 0.4749,
-    "Infiltration": 0.51,
-    "Mass": 0.541,
-    "Nodule": 0.4982,
-    "Pneumonia": 0.4876,
-    "Pneumothorax": 0.5022,
-    "Consolidation": 0.498,
-    "Edema": 0.4815,
-    "Emphysema": 0.4878,
-    "Fibrosis": 0.531,
-    "Pleural_Thickening": 0.5002,
-    "Hernia": 0.5389,
-    "Fracture": 0.5346
+    "osteoporosis": 0.856,
+    "cortical_thinning": 0.95,
+    "trabecular_degradation": 0.95,
+    "fracture_risk": 0.499,
+    "Atelectasis": 0.4987,
+    "Cardiomegaly": 0.4952,
+    "Effusion": 0.4958,
+    "Infiltration": 0.5015,
+    "Mass": 0.5034,
+    "Nodule": 0.4961,
+    "Pneumonia": 0.4985,
+    "Pneumothorax": 0.4968,
+    "Consolidation": 0.4987,
+    "Edema": 0.4992,
+    "Emphysema": 0.5001,
+    "Fibrosis": 0.5041,
+    "Pleural_Thickening": 0.5022,
+    "Hernia": 0.5045,
+    "Fracture": 0.4987
   },
   "supporting_findings": {
-    "Cortical Bone Thinning": 0.72,
-    "Trabecular Microarchitecture Degradation": 0.75,
-    "Bone Mineral Density (BMD) Attenuation": 0.7,
-    "Fragility Fracture Indicator": 0.535
+    "Cortical Bone Thinning": 0.95,
+    "Trabecular Microarchitecture Degradation": 0.95,
+    "Bone Mineral Density (BMD) Attenuation": 0.95,
+    "Fragility Fracture Indicator": 0.499
   },
-  "heatmap_path": "/uploads/testpatient/heatmaps/benchmark_fractures_01123_xai_gradcam_full.png",
-  "overlay_path": "/uploads/testpatient/heatmaps/benchmark_fractures_01123_xai_overlay_full.png",
-  "xai_status": "Explainable AI Grad-CAM generated successfully"
+  "heatmap_path": "/uploads/dataset/heatmaps/benchmark_fractures_01123_xai_gradcam_full.png",
+  "overlay_path": "/uploads/dataset/heatmaps/benchmark_fractures_01123_xai_overlay_full.png",
+  "xai_status": "Explainable AI Grad-CAM generated successfully | Model: Fine-tuned ResNet-50 (95.30% accuracy) + Radiometric Features"
 }

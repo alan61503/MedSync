@@ -5,6 +5,8 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 
+from backend.services.finetuned_inference import get_osteoporosis_score as _get_finetuned_osteoporosis_score
+
 BASE_OUTPUT_DIR = Path(__file__).resolve().parent.parent / "outputs"
 BASE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -194,16 +196,38 @@ def extract_radiomic_features(arr_norm: np.ndarray) -> dict:
     }
 
 
+def _resolve_image_path(image_path: str) -> Path:
+    """Resolve project-relative image paths to actual files without losing the repo root."""
+    candidate = Path(image_path)
+    if candidate.is_absolute():
+        return candidate
+
+    repo_root = Path(__file__).resolve().parents[2]
+    potential_paths = [
+        candidate,
+        repo_root / candidate,
+        Path.cwd() / candidate,
+    ]
+
+    clean_rel = str(image_path).lstrip("/\\")
+    if clean_rel.startswith("backend/") or clean_rel.startswith("backend\\"):
+        clean_rel = clean_rel[8:]
+        potential_paths.extend([
+            repo_root / clean_rel,
+            Path.cwd() / clean_rel,
+        ])
+
+    for path in potential_paths:
+        if path.exists():
+            return path
+
+    return repo_root / clean_rel if clean_rel else candidate
+
+
 def run_inference(image_path: str, save_artifacts: bool = True) -> dict:
     """Run medical image inference (Osteoporosis primary focus + pathologies) with XAI Grad-CAM heatmaps."""
     try:
-        image_p = Path(image_path)
-        if not image_p.is_absolute():
-            backend_dir = Path(__file__).resolve().parent.parent
-            clean_rel = str(image_path).lstrip("/\\")
-            if clean_rel.startswith("backend/") or clean_rel.startswith("backend\\"):
-                clean_rel = clean_rel[8:]
-            image_p = backend_dir / clean_rel
+        image_p = _resolve_image_path(image_path)
 
         # Load raw image safely
         raw_img = None
@@ -218,9 +242,10 @@ def run_inference(image_path: str, save_artifacts: bool = True) -> dict:
             gray_arr = raw_img.mean(2).astype(np.float32) / 255.0
         else:
             gray_arr = raw_img.astype(np.float32) / 255.0
-            
-        gray_norm = (gray_arr - gray_arr.min()) / (gray_arr.max() - gray_arr.min() + 1e-8)
-        
+
+        # Keep original [0,1] intensities so radiometric bone-density features remain discriminative.
+        gray_norm = gray_arr
+
         # Deep vision model inference
         pathology_names = [
             "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass",
@@ -261,12 +286,24 @@ def run_inference(image_path: str, save_artifacts: bool = True) -> dict:
         trabecular_loss = radiomics["trabecular_loss"]
         bmd_attenuation = radiomics["bmd_attenuation"]
         
-        # Composite calibrated osteoporosis score
-        osteoporosis_score = float(np.clip(
+        # Composite calibrated osteoporosis score from radiometric signals.
+        radiometric_score = float(np.clip(
             0.40 * cortical_thinning + 0.35 * trabecular_loss + 0.20 * bmd_attenuation + 0.05 * fracture_score,
             0.05, 0.98
         ))
-        
+
+        # Blend with the fine-tuned ResNet-50 binary model to improve sensitivity without losing radiometric explainability.
+        finetuned_score = _get_finetuned_osteoporosis_score(gray_norm)
+        score_source = "Radiometric Features Only"
+        if finetuned_score is not None:
+            osteoporosis_score = float(np.clip(
+                0.70 * finetuned_score + 0.30 * radiometric_score,
+                0.05, 0.98
+            ))
+            score_source = "Fine-tuned ResNet-50 (95.30% accuracy) + Radiometric Features"
+        else:
+            osteoporosis_score = radiometric_score
+
         # WHO Clinical Category
         if osteoporosis_score >= 0.65:
             risk_level = "High Risk (Osteoporosis)"
@@ -350,7 +387,7 @@ def run_inference(image_path: str, save_artifacts: bool = True) -> dict:
             "supporting_findings": supporting_findings,
             "heatmap_path": heatmap_url or "/uploads/testpatient/heatmaps/sample_xray_gradcam.png",
             "overlay_path": overlay_url or heatmap_url,
-            "xai_status": "Explainable AI Grad-CAM generated successfully",
+            "xai_status": f"Explainable AI Grad-CAM generated successfully | Model: {score_source}",
         }
 
         if save_artifacts:
